@@ -22,16 +22,13 @@ ifcc: $(OBJECTS)
 # compile our hand-writen C++ code: main(), CodeGenVisitor, etc.
 build/%.o: %.cpp generated/ifccParser.cpp
 	@mkdir -p build
-	$(CC) $(CCFLAGS) -MMD -o $@ $< 
+	$(CC) $(CCFLAGS) -o $@ $< 
 
 ##########################################
 # compile all the antlr-generated C++
 build/%.o: generated/%.cpp
 	@mkdir -p build
-	$(CC) $(CCFLAGS) -MMD -o $@ $< 
-
-# automagic dependency management: `gcc -MMD` generates all the .d files for us
--include build/*.d
+	$(CC) $(CCFLAGS) -o $@ $< 
 
 ##########################################
 # generate the C++ implementation of our Lexer/Parser/Visitor
