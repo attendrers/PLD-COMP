@@ -1,0 +1,8 @@
+antlr
+antlr-4.9.2-complete.jar
+antlr.tmp
+/compiler/*.c
+/compiler/*.s
+/compiler/a.out
+/compiler/ifcc
+/compiler/runmake_ubuntu.sh
