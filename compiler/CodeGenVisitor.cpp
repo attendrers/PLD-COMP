@@ -23,6 +23,10 @@ class Var{
 
 };
 
+class Const{
+	
+}
+
 antlrcpp::Any CodeGenVisitor::visitProg(ifccParser::ProgContext *ctx) 
 {
 	int retval;
