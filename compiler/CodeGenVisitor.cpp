@@ -1,4 +1,6 @@
 #include "CodeGenVisitor.h"
+#include "ExprVisitor.h"
+
 #include <string>
 #include <map>
 #include <algorithm>
@@ -31,20 +33,36 @@ antlrcpp::Any CodeGenVisitor::visitProg(ifccParser::ProgContext *ctx)
 		ifccParser::LineContext * current = ctx->line().at(i);
 		// We are in a declaration line
 		if(current->RETURN()==nullptr){
-			// Case int a = 5 ; 
-			if(current->ALPHANUMERIC().size()==1){
-				string varName = current->ALPHANUMERIC().at(0)->getText();
-				int varValue = stoi(current->CONST()->getText());
-				vars.push_back(make_pair(varName,Var(varValue)));
+			// No expr on right side
+			if(current->expr()==nullptr){
+				// Case int a = 5 ; 
+				if(current->ALPHANUMERIC().size()==1){
+					string varName = current->ALPHANUMERIC().at(0)->getText();
+					int varValue = stoi(current->CONST()->getText());
+					vars.push_back(make_pair(varName,Var(varValue)));
+				}
+				// Case int b = a;
+				else if(current->ALPHANUMERIC().size()==2){
+					string leftVar = current->ALPHANUMERIC().at(1)->getText(); 
+					string rightVar= current->ALPHANUMERIC().at(0)->getText();
+					vars.push_back(make_pair(rightVar,Var(leftVar)));
+					
+				}
 			}
-			// Case int b = a;
+
+			// Expr on right side
 			else{
-				string leftVar = current->ALPHANUMERIC().at(1)->getText(); 
-				string rightVar= current->ALPHANUMERIC().at(0)->getText();
-				vars.push_back(make_pair(rightVar,Var(leftVar)));
-				
+				string leftVar = current->ALPHANUMERIC().at(0)->getText();
+				// Case where we only have consts in the expr: int a = 5+4 ;
+				// if(current->ALPHANUMERIC().size()==1){
+				// 	ExprVisitor e;
+				// 	int result = e.visit(current->expr());
+				// 	vars.push_back(make_pair(leftVar,Var(result)));
+				// }
+				cout<<"Expr: "<<current->expr()->getText()<<endl;
+				ExprVisitor e;
+				e.visit(current->expr());
 			}
-			
 	
 		}
 

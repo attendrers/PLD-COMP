@@ -29,6 +29,8 @@ public:
 
     virtual antlrcpp::Any visitDiv(ifccParser::DivContext *context) = 0;
 
+    virtual antlrcpp::Any visitALPHANUMERIC(ifccParser::ALPHANUMERICContext *context) = 0;
+
     virtual antlrcpp::Any visitMinus(ifccParser::MinusContext *context) = 0;
 
     virtual antlrcpp::Any visitMult(ifccParser::MultContext *context) = 0;

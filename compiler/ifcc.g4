@@ -6,6 +6,7 @@ prog : 'int' 'main' '(' ')' '{' line* '}' ;
 
 line: 'int' ALPHANUMERIC '=' CONST ';'
 | 'int' ALPHANUMERIC '=' ALPHANUMERIC ';'
+| 'int' ALPHANUMERIC '=' expr ';'
 | RETURN CONST ';' ;
 
 expr: expr '*' expr # mult
@@ -13,6 +14,7 @@ expr: expr '*' expr # mult
 | expr '/' expr # div
 | expr '-' expr # minus
 | CONST # CONST
+| ALPHANUMERIC # ALPHANUMERIC
 | '(' expr ')'  # par ;
 
 

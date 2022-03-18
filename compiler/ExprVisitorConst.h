@@ -4,7 +4,6 @@
 
 
 #include "generated/ifccBaseVisitor.h"
-#include <string>
 
 
 
@@ -13,18 +12,11 @@
  * produced by ifccParser.
  */
 class  ExprVisitor : public ifccBaseVisitor {
-    protected:
-        int i;
 public:
 
   /**
    * Visit parse trees produced by ifccParser.
    */
-
-    ExprVisitor(){
-        ifccBaseVisitor();
-        i=0;
-    }
 
     virtual antlrcpp::Any visitPar(ifccParser::ParContext *context){
         return visit(context->expr())   ;
@@ -43,15 +35,15 @@ public:
     }
 
     virtual antlrcpp::Any visitCONST(ifccParser::CONSTContext *context) {
-        return ("$"+context->CONST()->getText());
+        return stoi(context->CONST()->getText());
     }
 
     virtual antlrcpp::Any visitPlus(ifccParser::PlusContext *context){
-        return "addl %eax %edx";
+        return (int) visit(context->expr(0))+(int) visit(context->expr(1));
     }
 
     virtual antlrcpp::Any visitALPHANUMERIC(ifccParser::ALPHANUMERICContext *context){
-        return context->ALPHANUMERIC()->getText();
+        return nullptr;
     }
 
 

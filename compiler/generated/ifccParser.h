@@ -70,6 +70,7 @@ public:
     std::vector<antlr4::tree::TerminalNode *> ALPHANUMERIC();
     antlr4::tree::TerminalNode* ALPHANUMERIC(size_t i);
     antlr4::tree::TerminalNode *CONST();
+    ExprContext *expr();
     antlr4::tree::TerminalNode *RETURN();
 
 
@@ -107,6 +108,15 @@ public:
 
     std::vector<ExprContext *> expr();
     ExprContext* expr(size_t i);
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  ALPHANUMERICContext : public ExprContext {
+  public:
+    ALPHANUMERICContext(ExprContext *ctx);
+
+    antlr4::tree::TerminalNode *ALPHANUMERIC();
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };

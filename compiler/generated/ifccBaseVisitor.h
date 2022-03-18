@@ -35,6 +35,10 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual antlrcpp::Any visitALPHANUMERIC(ifccParser::ALPHANUMERICContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual antlrcpp::Any visitMinus(ifccParser::MinusContext *ctx) override {
     return visitChildren(ctx);
   }
