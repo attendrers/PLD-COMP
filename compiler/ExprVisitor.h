@@ -5,8 +5,7 @@
 
 #include "generated/ifccBaseVisitor.h"
 #include <string>
-
-
+using namespace std;
 
 /**
  * This class defines an abstract visitor for a parse tree
@@ -15,15 +14,18 @@
 class  ExprVisitor : public ifccBaseVisitor {
     protected:
         int i;
+        string assemblerText;
+        unordered_map <string,int> offsets;
+       
 public:
 
   /**
    * Visit parse trees produced by ifccParser.
    */
 
-    ExprVisitor(){
+    ExprVisitor(unordered_map <string,int> & offsets):offsets(offsets){
         ifccBaseVisitor();
-        i=0;
+        i=-1;
     }
 
     virtual antlrcpp::Any visitPar(ifccParser::ParContext *context){
@@ -43,15 +45,23 @@ public:
     }
 
     virtual antlrcpp::Any visitCONST(ifccParser::CONSTContext *context) {
-        return ("$"+context->CONST()->getText());
+        // i++;
+        // return string("#tmp"+to_string(i));
+        return string("$"+context->CONST()->getText());
     }
 
     virtual antlrcpp::Any visitPlus(ifccParser::PlusContext *context){
-        return "addl %eax %edx";
+        string tmp0 = (string) visit(context->expr(0));
+        string tmp1 = (string) visit(context->expr(1));
+        assemblerText+="movl    "+tmp0+", %edx\n";
+        assemblerText+="movl    "+tmp1+", %eax\n";
+        assemblerText+="addl	%edx, %eax\n";
+        i++;
+        return string("#tmp"+to_string(i));
     }
 
     virtual antlrcpp::Any visitALPHANUMERIC(ifccParser::ALPHANUMERICContext *context){
-        return context->ALPHANUMERIC()->getText();
+        return string(to_string(offsets[context->ALPHANUMERIC()->getText()])+"(%rbp)");
     }
 
 
@@ -67,6 +77,10 @@ public:
     antlrcpp::Any visitLine(ifccParser::LineContext *context){
         return nullptr;
     };
+
+    string getAssemblerText(){
+        return assemblerText;
+    }
 
 
 };

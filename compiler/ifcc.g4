@@ -10,8 +10,8 @@ line: 'int' ALPHANUMERIC '=' CONST ';'
 | RETURN CONST ';' ;
 
 expr: expr '*' expr # mult
-| expr '+' expr # plus
 | expr '/' expr # div
+| expr '+' expr # plus
 | expr '-' expr # minus
 | CONST # CONST
 | ALPHANUMERIC # ALPHANUMERIC

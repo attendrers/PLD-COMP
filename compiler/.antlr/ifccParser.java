@@ -31,7 +31,7 @@ public class ifccParser extends Parser {
 	private static String[] makeLiteralNames() {
 		return new String[] {
 			null, "'int'", "'main'", "'('", "')'", "'{'", "'}'", "'='", "';'", "'*'", 
-			"'+'", "'/'", "'-'", "'return'"
+			"'/'", "'+'", "'-'", "'return'"
 		};
 	}
 	private static final String[] _LITERAL_NAMES = makeLiteralNames();
@@ -415,7 +415,7 @@ public class ifccParser extends Parser {
 						break;
 					case 2:
 						{
-						_localctx = new PlusContext(new ExprContext(_parentctx, _parentState));
+						_localctx = new DivContext(new ExprContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
 						setState(56);
 						if (!(precpred(_ctx, 6))) throw new FailedPredicateException(this, "precpred(_ctx, 6)");
@@ -427,7 +427,7 @@ public class ifccParser extends Parser {
 						break;
 					case 3:
 						{
-						_localctx = new DivContext(new ExprContext(_parentctx, _parentState));
+						_localctx = new PlusContext(new ExprContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
 						setState(59);
 						if (!(precpred(_ctx, 5))) throw new FailedPredicateException(this, "precpred(_ctx, 5)");

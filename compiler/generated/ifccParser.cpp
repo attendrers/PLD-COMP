@@ -507,7 +507,7 @@ ifccParser::ExprContext* ifccParser::expr(int precedence) {
         }
 
         case 2: {
-          auto newContext = _tracker.createInstance<PlusContext>(_tracker.createInstance<ExprContext>(parentContext, parentState));
+          auto newContext = _tracker.createInstance<DivContext>(_tracker.createInstance<ExprContext>(parentContext, parentState));
           _localctx = newContext;
           pushNewRecursionContext(newContext, startState, RuleExpr);
           setState(56);
@@ -521,7 +521,7 @@ ifccParser::ExprContext* ifccParser::expr(int precedence) {
         }
 
         case 3: {
-          auto newContext = _tracker.createInstance<DivContext>(_tracker.createInstance<ExprContext>(parentContext, parentState));
+          auto newContext = _tracker.createInstance<PlusContext>(_tracker.createInstance<ExprContext>(parentContext, parentState));
           _localctx = newContext;
           pushNewRecursionContext(newContext, startState, RuleExpr);
           setState(59);
@@ -602,7 +602,7 @@ std::vector<std::string> ifccParser::_ruleNames = {
 
 std::vector<std::string> ifccParser::_literalNames = {
   "", "'int'", "'main'", "'('", "')'", "'{'", "'}'", "'='", "';'", "'*'", 
-  "'+'", "'/'", "'-'", "'return'"
+  "'/'", "'+'", "'-'", "'return'"
 };
 
 std::vector<std::string> ifccParser::_symbolicNames = {
