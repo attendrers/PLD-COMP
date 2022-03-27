@@ -16,7 +16,7 @@ class  ExprVisitor : public ifccBaseVisitor {
         int i;
         string assemblerText;
         unordered_map <string,int> offsets;
-       
+    
 public:
 
   /**
@@ -32,16 +32,36 @@ public:
         return visit(context->expr())   ;
     };
 
-    virtual antlrcpp::Any visitDiv(ifccParser::DivContext *context){
-        return (int) visit(context->expr(0))/(int) visit(context->expr(1));
-    };
-
     virtual antlrcpp::Any visitMinus(ifccParser::MinusContext *context){
-        return (int) visit(context->expr(0))-(int) visit(context->expr(1));
+        string tmp0 = (string) visit(context->expr(0));
+        string tmp1 = (string) visit(context->expr(1));
+        assemblerText+="        movl    "+tmp0+", %edx\n";
+        assemblerText+="        movl    "+tmp1+", %eax\n";
+        assemblerText+="        subl	%edx, %eax\n";
+        // i++;
+        // return string("#tmp"+to_string(i));
+        return string("%eax");
     };
 
-    virtual antlrcpp::Any visitMult(ifccParser::MultContext *context) {
-        return (int) visit(context->expr(0))*(int) visit(context->expr(1));
+    virtual antlrcpp::Any visitMuldiv(ifccParser::MuldivContext *context) {
+        string tmp0 = (string) visit(context->expr(0));
+        string tmp1 = (string) visit(context->expr(1));
+        char op = context->OP()->getText()[0];
+        if(op=='*'){
+            assemblerText+="        movl    "+tmp0+", %edx\n";
+            assemblerText+="        movl    "+tmp1+", %eax\n";
+            assemblerText+="        imul	%edx, %eax\n";
+        }
+        else{
+            assemblerText+="        movl    "+tmp0+", %eax\n";
+            assemblerText+="        cltd\n";
+            // %edx is used by the cltd command so we're gonna use %ebx instead it's a 32bits register just like %eax and %edx
+            assemblerText+="        movl    "+tmp1+", %ebx\n";
+            assemblerText+="        idivl	%ebx \n";
+        }
+        // i++;
+        // return string("#tmp"+to_string(i));
+        return string("%eax");
     }
 
     virtual antlrcpp::Any visitCONST(ifccParser::CONSTContext *context) {
@@ -53,11 +73,12 @@ public:
     virtual antlrcpp::Any visitPlus(ifccParser::PlusContext *context){
         string tmp0 = (string) visit(context->expr(0));
         string tmp1 = (string) visit(context->expr(1));
-        assemblerText+="movl    "+tmp0+", %edx\n";
-        assemblerText+="movl    "+tmp1+", %eax\n";
-        assemblerText+="addl	%edx, %eax\n";
-        i++;
-        return string("#tmp"+to_string(i));
+        assemblerText+="        movl    "+tmp0+", %edx\n";
+        assemblerText+="        movl    "+tmp1+", %eax\n";
+        assemblerText+="        addl	%edx, %eax\n";
+        // i++;
+        // return string("#tmp"+to_string(i));
+        return string("%eax");
     }
 
     virtual antlrcpp::Any visitALPHANUMERIC(ifccParser::ALPHANUMERICContext *context){

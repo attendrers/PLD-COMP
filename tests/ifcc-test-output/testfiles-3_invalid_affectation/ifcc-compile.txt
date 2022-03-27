@@ -1,0 +1,5 @@
+line 1:0 missing 'int' at 'main'
+line 2:8 no viable alternative at input 'int 1'
+error: syntax error during parsing
+
+return code: 1
