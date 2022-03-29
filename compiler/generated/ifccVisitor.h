@@ -27,13 +27,13 @@ public:
 
     virtual antlrcpp::Any visitPar(ifccParser::ParContext *context) = 0;
 
-    virtual antlrcpp::Any visitDiv(ifccParser::DivContext *context) = 0;
+    virtual antlrcpp::Any visitALPHANUMERIC(ifccParser::ALPHANUMERICContext *context) = 0;
 
     virtual antlrcpp::Any visitMinus(ifccParser::MinusContext *context) = 0;
 
-    virtual antlrcpp::Any visitMult(ifccParser::MultContext *context) = 0;
-
     virtual antlrcpp::Any visitCONST(ifccParser::CONSTContext *context) = 0;
+
+    virtual antlrcpp::Any visitMuldiv(ifccParser::MuldivContext *context) = 0;
 
     virtual antlrcpp::Any visitPlus(ifccParser::PlusContext *context) = 0;
 

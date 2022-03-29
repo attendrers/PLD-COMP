@@ -3,7 +3,9 @@
 	# prologue
 	pushq %rbp
 	movq %rsp, %rbp
+
  	movl	$42, %eax
-	#epilogue
+	
+	# epilogue
 	popq %rbp
  	ret

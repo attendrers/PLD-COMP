@@ -31,7 +31,7 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitDiv(ifccParser::DivContext *ctx) override {
+  virtual antlrcpp::Any visitALPHANUMERIC(ifccParser::ALPHANUMERICContext *ctx) override {
     return visitChildren(ctx);
   }
 
@@ -39,11 +39,11 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitMult(ifccParser::MultContext *ctx) override {
+  virtual antlrcpp::Any visitCONST(ifccParser::CONSTContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitCONST(ifccParser::CONSTContext *ctx) override {
+  virtual antlrcpp::Any visitMuldiv(ifccParser::MuldivContext *ctx) override {
     return visitChildren(ctx);
   }
 
