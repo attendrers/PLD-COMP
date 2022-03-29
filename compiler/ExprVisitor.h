@@ -81,6 +81,41 @@ public:
         return string("%eax");
     }
 
+    virtual antlrcpp::Any visitOp_or(ifccParser::Op_orContext *context) override {
+     string tmp0 = (string) visit(context->expr(0));
+        string tmp1 = (string) visit(context->expr(1));
+        assemblerText+="        movl    "+tmp0+", %edx\n";
+        assemblerText+="        movl    "+tmp1+", %eax\n";
+        assemblerText+="        orl	%edx, %eax\n";
+        // i++;
+        // return string("#tmp"+to_string(i));
+        return string("%eax");
+    }
+
+    virtual antlrcpp::Any visitOp_and(ifccParser::Op_andContext *context) override {
+         string tmp0 = (string) visit(context->expr(0));
+        string tmp1 = (string) visit(context->expr(1));
+        assemblerText+="        movl    "+tmp0+", %edx\n";
+        assemblerText+="        movl    "+tmp1+", %eax\n";
+        assemblerText+="        andl	%edx, %eax\n";
+        // i++;
+        // return string("#tmp"+to_string(i));
+        return string("%eax");
+    }
+
+    virtual antlrcpp::Any visitOp_xor(ifccParser::Op_xorContext *context) override {
+        string tmp0 = (string) visit(context->expr(0));
+        string tmp1 = (string) visit(context->expr(1));
+        assemblerText+="        movl    "+tmp0+", %edx\n";
+        assemblerText+="        movl    "+tmp1+", %eax\n";
+        assemblerText+="        xorl	%edx, %eax\n";
+        // i++;
+        // return string("#tmp"+to_string(i));
+        return string("%eax");
+    }
+
+
+
     virtual antlrcpp::Any visitALPHANUMERIC(ifccParser::ALPHANUMERICContext *context){
         return string(to_string(offsets[context->ALPHANUMERIC()->getText()])+"(%rbp)");
     }
