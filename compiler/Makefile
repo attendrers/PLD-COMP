@@ -62,5 +62,6 @@ clean clear:
 	rm -f ifcc
 
 test:
-	python3 ../tests/ifcc-test.py ../tests/testfiles
+	cd ../tests && python3 ifcc-test.py testfiles;
+	
 

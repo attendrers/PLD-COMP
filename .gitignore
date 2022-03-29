@@ -9,4 +9,6 @@ antlr.tmp
 /compiler/*.o
 /compiler/build
 /compiler/generated
+/compiler/.antlr
+/tests/ifcc-test-output
 .vscode
