@@ -4,21 +4,23 @@ axiom : prog ;
 
 prog : 'int' 'main' '(' ')' '{' line* '}' ;
 
-line: TYPE ALPHANUMERIC '=' CONST ';'
+line: TYPE ALPHANUMERIC '=' INT_CONST ';'
+| TYPE ALPHANUMERIC '=' CHAR_CONST ';'
 | TYPE ALPHANUMERIC '=' ALPHANUMERIC ';'
 | TYPE ALPHANUMERIC '=' expr ';'
-| RETURN (CONST|ALPHANUMERIC|expr) ';' ;
+| RETURN (INT_CONST|ALPHANUMERIC|expr) ';' ;
 
 expr: expr OP expr # muldiv
 | expr '+' expr # plus
 | expr '-' expr # minus
-| CONST # CONST
+| INT_CONST # INT_CONST
 | ALPHANUMERIC # ALPHANUMERIC
 | '(' expr ')'  # par ;
 
 
 RETURN : 'return' ;
-CONST : [0-9]+ ;
+INT_CONST : [-]?[0-9]+ ;
+CHAR_CONST : '\'' . '\'';
 COMMENT : '/*' .*? '*/' -> skip ;
 DIRECTIVE : '#' .*? '\n' -> skip ;
 WS    : [ \t\r\n] -> channel(HIDDEN);
