@@ -31,6 +31,7 @@ build/%.o: generated/%.cpp
 	$(CC) $(CCFLAGS) -MMD  -o $@ $< 
 
 -include build/*.d
+build/%.d:
 
 ##########################################
 # generate the C++ implementation of our Lexer/Parser/Visitor
