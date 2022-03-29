@@ -9,3 +9,4 @@ antlr.tmp
 /compiler/*.o
 /compiler/build
 /compiler/generated
+.vscode

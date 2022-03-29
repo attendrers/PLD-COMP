@@ -57,6 +57,6 @@ gui:
 
 ##########################################
 # delete all machine-generated files
-clean:
+clean clear:
 	rm -rf build generated
 	rm -f ifcc
