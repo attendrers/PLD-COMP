@@ -4,9 +4,9 @@ axiom : prog ;
 
 prog : 'int' 'main' '(' ')' '{' line* '}' ;
 
-line: 'int' ALPHANUMERIC '=' CONST ';'
-| 'int' ALPHANUMERIC '=' ALPHANUMERIC ';'
-| 'int' ALPHANUMERIC '=' expr ';'
+line: TYPE ALPHANUMERIC '=' CONST ';'
+| TYPE ALPHANUMERIC '=' ALPHANUMERIC ';'
+| TYPE ALPHANUMERIC '=' expr ';'
 | RETURN (CONST|ALPHANUMERIC|expr) ';' ;
 
 expr: expr OP expr # muldiv
@@ -24,3 +24,4 @@ DIRECTIVE : '#' .*? '\n' -> skip ;
 WS    : [ \t\r\n] -> channel(HIDDEN);
 ALPHANUMERIC: [a-zA-Z] [a-zA-Z0-9]*;
 OP : ('*'|'/');
+TYPE : 'int' | 'char';
