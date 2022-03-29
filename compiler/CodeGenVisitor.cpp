@@ -47,7 +47,7 @@ antlrcpp::Any CodeGenVisitor::visitProg(ifccParser::ProgContext *ctx)
 				// Case int a = 5 ; 
 				if(current->ALPHANUMERIC().size()==1){
 					string varName = current->ALPHANUMERIC().at(0)->getText();
-					int varValue = stoi(current->CONST()->getText());
+					int varValue = stoi(current->INT_CONST()->getText());
 					vars.push_back(make_pair(varName,Var(varValue)));
 					offsets[varName] = -((i+1)*4);
 					cout<<"	movl	$"<<varValue<<", "<<(-(i+1)*4)<<"(%rbp)\n";
@@ -80,8 +80,8 @@ antlrcpp::Any CodeGenVisitor::visitProg(ifccParser::ProgContext *ctx)
 		// We are in a return line
 		else{
 			// Case return constant ( return 10; )
-			if(current->CONST()!=nullptr){
-				retval = stoi(current->CONST()->getText());
+			if(current->INT_CONST()!=nullptr){
+				retval = stoi(current->INT_CONST()->getText());
 				cout<<" 	movl	$"<<retval<<", %eax\n";
 			}
 			// Case return variable ( return a; )
