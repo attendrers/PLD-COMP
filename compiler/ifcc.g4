@@ -9,12 +9,16 @@ line: 'int' ALPHANUMERIC '=' CONST ';'
 | 'int' ALPHANUMERIC '=' expr ';'
 | RETURN (CONST|ALPHANUMERIC|expr) ';' ;
 
-expr: expr OP expr # muldiv
+expr: 
+  '!' expr # op_not
+| '-' expr # op_opposite
+| expr OP expr # muldiv
 | expr '+' expr # plus
 | expr '-' expr # minus
 | expr '|' expr # op_or
 | expr '&' expr # op_and
 | expr '^' expr # op_xor
+
 | CONST # CONST
 | ALPHANUMERIC # ALPHANUMERIC
 | '(' expr ')'  # par ;

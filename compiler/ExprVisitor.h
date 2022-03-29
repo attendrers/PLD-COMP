@@ -114,11 +114,25 @@ public:
         return string("%eax");
     }
 
-
-
     virtual antlrcpp::Any visitALPHANUMERIC(ifccParser::ALPHANUMERICContext *context){
         return string(to_string(offsets[context->ALPHANUMERIC()->getText()])+"(%rbp)");
     }
+
+    virtual antlrcpp::Any visitOp_opposite(ifccParser::Op_oppositeContext *context) override {
+        string tmp0 = (string) visit(context->expr());
+        assemblerText+="        movl    "+tmp0+", %eax\n";
+	    assemblerText+="        negl	%eax\n";
+        return string("%eax");
+    }
+
+    virtual antlrcpp::Any visitOp_not(ifccParser::Op_notContext *context) override {
+        string tmp0 = (string) visit(context->expr());
+        assemblerText+="        cmpl	$0, "+tmp0+"\n";
+	    assemblerText+="        sete	%al\n";
+	    assemblerText+="        movzbl	%al, %eax\n";
+        return string("%eax");
+    }
+
 
 
 

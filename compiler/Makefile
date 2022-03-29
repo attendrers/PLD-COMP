@@ -60,3 +60,7 @@ gui:
 clean clear:
 	rm -rf build generated
 	rm -f ifcc
+
+test:
+	python3 ../tests/ifcc-test.py ../tests/testfiles
+
