@@ -4,40 +4,46 @@ axiom : prog ;
 
 prog : TYPE 'main' '(' ')' '{' line* '}' ;
 
-line: TYPE ALPHANUMERIC '=' CONST ';' # declaration_const
-| TYPE ALPHANUMERIC '=' ALPHANUMERIC ';' # declaration_variable
-| TYPE ALPHANUMERIC '=' expr ';' # declaration_expr
-| return_global # return ;
+line
+    : TYPE ALPHANUMERIC '=' CONST ';'                 # declaration_const
+    | TYPE ALPHANUMERIC '=' ALPHANUMERIC ';'          # declaration_variable
+    | TYPE ALPHANUMERIC '=' expr ';'                  # declaration_expr
+    | return_global                                   # return ;
 
-return_global: RETURN CONST ';' # return_const
-| RETURN ALPHANUMERIC ';'  # return_variable
-| RETURN expr ';' # return_expr ;
+return_global
+    : RETURN CONST ';'                                # return_const
+    | RETURN ALPHANUMERIC ';'                         # return_variable
+    | RETURN expr ';'                                 # return_expr ;
 
+primaryexpr
+    : INT_CONST                                       #int
+    | CHAR_CONST                                      #char
+    | ALPHANUMERIC                                    #variable
+    ;
 
-expr: 
-  '!' expr # op_not
-| '-' expr # op_opposite
-| expr OP expr # muldiv
-| expr '+' expr # plus
-| expr '-' expr # minus
-| expr '|' expr # op_or
-| expr '&' expr # op_and
-| expr '^' expr # op_xor
-| expr '==' expr # op_equal
-| expr '!=' expr # op_not_equal
-| expr '<' expr # op_inf
-| expr '>' expr # op_sup
-
-| CONST # CONST
-| ALPHANUMERIC # ALPHANUMERIC
-| '(' expr ')'  # par ;
-
+expr
+    : '(' expr ')'                                    # par
+    | primaryexpr                                     # prExpr
+    | '!' expr                                        # op_not
+    | '-' expr                                        # op_opposite
+    | left=expr op=('*'|'/') right=expr               # op_muldiv
+    | left=expr op=('+'|'-') right=expr               # op_plusmoins
+    | left=expr op=('<'|'>'|'<='|'>=') right=expr     # op_infsup
+    | left=expr op=('=='|'!=') right=expr             # op_equalornot
+    | left=expr op=('&'|'^'|'|') right=expr           # op_bit
+    ;
 
 RETURN : 'return' ;
-TYPE: 'int';
-CONST : [0-9]+ ;
+INT_CONST : [-]?[0-9]+ ;
+CHAR_CONST : '\'' . '\'';
 COMMENT : '/*' .*? '*/' -> skip ;
+INLINECOMMENT : '//' ~[\r\n]* [\r\n] -> skip ;
 DIRECTIVE : '#' .*? '\n' -> skip ;
 WS    : [ \t\r\n] -> channel(HIDDEN);
-ALPHANUMERIC: [a-zA-Z] [a-zA-Z0-9]*;
-OP : ('*'|'/');
+ALPHANUMERIC: [_a-zA-Z] [_a-zA-Z0-9]*;
+
+
+
+
+
+
