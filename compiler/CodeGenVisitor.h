@@ -43,52 +43,31 @@ class CodeGenVisitor : public ifccBaseVisitor
         virtual antlrcpp::Any visitReturn_expr(ifccParser::Return_exprContext *ctx) override ;
 
         // Expressions
-        // virtual antlrcpp::Any visitPlus(ifccParser::PlusContext *ctx) override ;
+        
+        virtual antlrcpp::Any CodeGenVisitor::visitPar(ifccParser::ParContext *context) override;
 
-};
+        virtual antlrcpp::Any visitPrExpr(ifccParser::PrExprContext *ctx) override ;
 
-class ExprVisitor : public ifccBaseVisitor {
-	protected:
-        int i;
-        string assemblerText;
-        unordered_map <string,int> offsets;
-	public:
-		ExprVisitor(unordered_map <string,int> & offsets):offsets(offsets);
+        virtual antlrcpp::Any visitOp_infsup(ifccParser::Op_infsupContext *ctx) override ;
 
-		virtual antlrcpp::Any CodeGenVisitor::visitPar(ifccParser::ParContext *context);
+        virtual antlrcpp::Any visitOp_equalornot(ifccParser::Op_equalornotContext *ctx) override ;
 
-		virtual antlrcpp::Any CodeGenVisitor::visitMinus(ifccParser::MinusContext *context);
+        virtual antlrcpp::Any visitOp_not(ifccParser::Op_notContext *ctx) override ;
 
-		virtual antlrcpp::Any CodeGenVisitor::visitMuldiv(ifccParser::MuldivContext *context);
+        virtual antlrcpp::Any visitOp_opposite(ifccParser::Op_oppositeContext *ctx) override ;
 
-		virtual antlrcpp::Any CodeGenVisitor::visitCONST(ifccParser::CONSTContext *context);
+        virtual antlrcpp::Any visitOp_muldiv(ifccParser::Op_muldivContext *ctx) override ;
 
-		virtual antlrcpp::Any CodeGenVisitor::visitPlus(ifccParser::PlusContext *context);
+        virtual antlrcpp::Any visitOp_plusmoins(ifccParser::Op_plusmoinsContext *ctx) override ;
 
-		virtual antlrcpp::Any CodeGenVisitor::visitOp_or(ifccParser::Op_orContext *context) override;
+        virtual antlrcpp::Any visitOp_bit(ifccParser::Op_bitContext *ctx) override ;
 
-		virtual antlrcpp::Any CodeGenVisitor::visitOp_and(ifccParser::Op_andContext *context) override;
+        virtual antlrcpp::Any visitInt(ifccParser::IntContext *ctx) override ;
 
-		virtual antlrcpp::Any CodeGenVisitor::visitOp_xor(ifccParser::Op_xorContext *context) override;
 
-		virtual antlrcpp::Any CodeGenVisitor::visitOp_equal(ifccParser::Op_equalContext *context) override;
+        // primaryexpr
+        virtual antlrcpp::Any visitChar(ifccParser::CharContext *ctx) override ;
 
-		virtual antlrcpp::Any CodeGenVisitor::visitOp_not_equal(ifccParser::Op_not_equalContext *context) override;
-
-		virtual antlrcpp::Any CodeGenVisitor::visitOp_sup(ifccParser::Op_supContext *context) override;
-
-		virtual antlrcpp::Any CodeGenVisitor::visitOp_inf(ifccParser::Op_infContext *context) override;
-
-		virtual antlrcpp::Any CodeGenVisitor::visitALPHANUMERIC(ifccParser::ALPHANUMERICContext *context);
-
-		virtual antlrcpp::Any CodeGenVisitor::visitOp_opposite(ifccParser::Op_oppositeContext *context) override;
-
-		virtual antlrcpp::Any CodeGenVisitor::visitOp_not(ifccParser::Op_notContext *context) override;
-
-		antlrcpp::Any CodeGenVisitor::visitAxiom(ifccParser::AxiomContext *context);
-
-		antlrcpp::Any CodeGenVisitor::visitProg(ifccParser::ProgContext *context);
-
-		antlrcpp::Any CodeGenVisitor::visitLine(ifccParser::LineContext *context);
+        virtual antlrcpp::Any visitVariable(ifccParser::VariableContext *ctx) override ;
 
 };

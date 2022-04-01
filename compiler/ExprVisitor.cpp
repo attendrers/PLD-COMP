@@ -1,193 +1,216 @@
 
-// Generated from ifcc.g4 by ANTLR 4.9.2
-
-#pragma once
-#include "generated/ifccBaseVisitor.h"
 #include <string>
 #include "CodeGenVisitor.h"
 using namespace std;
 
-/**
- * This class defines an abstract visitor for a parse tree
- * produced by ifccParser.
- */
-class  ExprVisitor : public ifccBaseVisitor {
-	public:
+antlrcpp::Any CodeGenVisitor::visitPar(ifccParser::ParContext *context)
+{
+    return visit(context->expr());
+};
 
-	  /**
-	   * Visit parse trees produced by ifccParser.
-	   */
+antlrcpp::Any CodeGenVisitor::visitPrExpr(ifccParser::PrExprContext *ctx){
+    return visit(ctx->primaryexpr());
+};
 
-	    ExprVisitor(unordered_map <string,int> & offsets):offsets(offsets){
-	        ifccBaseVisitor();
-	        i=-1;
-	    }
+antlrcpp::Any CodeGenVisitor::visitOp_infsup(ifccParser::Op_infsupContext *ctx){
 
-	    antlrcpp::Any CodeGenVisitor::visitPar(ifccParser::ParContext *context){
-	        return visit(context->expr())   ;
-	    };
+};
 
-	    antlrcpp::Any CodeGenVisitor::visitMinus(ifccParser::MinusContext *context){
-	        string tmp0 = (string) visit(context->expr(0));
-	        string tmp1 = (string) visit(context->expr(1));
-	        assemblerText+="        movl    "+tmp0+", %edx\n";
-	        assemblerText+="        movl    "+tmp1+", %eax\n";
-	        assemblerText+="        subl	%edx, %eax\n";
-	        // i++;
-	        // return string("#tmp"+to_string(i));
-	        return string("%eax");
-	    };
+antlrcpp::Any CodeGenVisitor::visitOp_equalornot(ifccParser::Op_equalornotContext *ctx){
 
-	    antlrcpp::Any CodeGenVisitor::visitMuldiv(ifccParser::MuldivContext *context) {
-	        string tmp0 = (string) visit(context->expr(0));
-	        string tmp1 = (string) visit(context->expr(1));
-	        char op = context->OP()->getText()[0];
-	        if(op=='*'){
-	            assemblerText+="        movl    "+tmp0+", %edx\n";
-	            assemblerText+="        movl    "+tmp1+", %eax\n";
-	            assemblerText+="        imul	%edx, %eax\n";
-	        }
-	        else{
-	            assemblerText+="        movl    "+tmp0+", %eax\n";
-	            assemblerText+="        cltd\n";
-	            // %edx is used by the cltd command so we're gonna use %ebx instead it's a 32bits register just like %eax and %edx
-	            assemblerText+="        movl    "+tmp1+", %ebx\n";
-	            assemblerText+="        idivl	%ebx \n";
-	        }
-	        // i++;
-	        // return string("#tmp"+to_string(i));
-	        return string("%eax");
-	    }
+};
 
-	    antlrcpp::Any CodeGenVisitor::visitCONST(ifccParser::CONSTContext *context) {
-	        // i++;
-	        // return string("#tmp"+to_string(i));
-	        return string("$"+context->CONST()->getText());
-	    }
+antlrcpp::Any CodeGenVisitor::visitOp_not(ifccParser::Op_notContext *ctx){
 
-	    antlrcpp::Any CodeGenVisitor::visitPlus(ifccParser::PlusContext *context){
-	        string tmp0 = (string) visit(context->expr(0));
-	        string tmp1 = (string) visit(context->expr(1));
-	        assemblerText+="        movl    "+tmp0+", %edx\n";
-	        assemblerText+="        movl    "+tmp1+", %eax\n";
-	        assemblerText+="        addl	%edx, %eax\n";
-	        // i++;
-	        // return string("#tmp"+to_string(i));
-	        return string("%eax");
-	    }
+};
 
-	    antlrcpp::Any CodeGenVisitor::visitOp_or(ifccParser::Op_orContext *context) override {
-	     string tmp0 = (string) visit(context->expr(0));
-	        string tmp1 = (string) visit(context->expr(1));
-	        assemblerText+="        movl    "+tmp0+", %edx\n";
-	        assemblerText+="        movl    "+tmp1+", %eax\n";
-	        assemblerText+="        orl	%edx, %eax\n";
-	        // i++;
-	        // return string("#tmp"+to_string(i));
-	        return string("%eax");
-	    }
+antlrcpp::Any CodeGenVisitor::visitOp_opposite(ifccParser::Op_oppositeContext *ctx){
 
-	    antlrcpp::Any CodeGenVisitor::visitOp_and(ifccParser::Op_andContext *context) override {
-	         string tmp0 = (string) visit(context->expr(0));
-	        string tmp1 = (string) visit(context->expr(1));
-	        assemblerText+="        movl    "+tmp0+", %edx\n";
-	        assemblerText+="        movl    "+tmp1+", %eax\n";
-	        assemblerText+="        andl	%edx, %eax\n";
-	        // i++;
-	        // return string("#tmp"+to_string(i));
-	        return string("%eax");
-	    }
+};
 
-	    antlrcpp::Any CodeGenVisitor::visitOp_xor(ifccParser::Op_xorContext *context) override {
-	        string tmp0 = (string) visit(context->expr(0));
-	        string tmp1 = (string) visit(context->expr(1));
-	        assemblerText+="        movl    "+tmp0+", %edx\n";
-	        assemblerText+="        movl    "+tmp1+", %eax\n";
-	        assemblerText+="        xorl	%edx, %eax\n";
-	        // i++;
-	        // return string("#tmp"+to_string(i));
-	        return string("%eax");
-	    }
+antlrcpp::Any CodeGenVisitor::visitOp_muldiv(ifccParser::Op_muldivContext *ctx){
 
-	    antlrcpp::Any CodeGenVisitor::visitOp_equal(ifccParser::Op_equalContext *context) override {
-	        string tmp0 = (string) visit(context->expr(0));
-	        string tmp1 = (string) visit(context->expr(1));
-	        assemblerText+="        movl    "+tmp0+", %edx\n";
-	        assemblerText+="        movl    "+tmp1+", %eax\n";
-		    assemblerText+="        cmpl	%edx, %eax\n";
-		    assemblerText+="        sete	%al\n";
-		    assemblerText+="        movzbl	%al, %eax\n";
-	        return string("%eax");
-	    }
+};
 
-	    antlrcpp::Any CodeGenVisitor::visitOp_not_equal(ifccParser::Op_not_equalContext *context) override {
-	        string tmp0 = (string) visit(context->expr(0));
-	        string tmp1 = (string) visit(context->expr(1));
-	        assemblerText+="        movl    "+tmp0+", %edx\n";
-	        assemblerText+="        movl    "+tmp1+", %eax\n";
-		    assemblerText+="        cmpl	%edx, %eax\n";
-		    assemblerText+="        setne	%al\n";
-		    assemblerText+="        movzbl	%al, %eax\n";
-	        return string("%eax");
-	    }
+antlrcpp::Any CodeGenVisitor::visitOp_plusmoins(ifccParser::Op_plusmoinsContext *ctx){
+    
+};
 
-	    antlrcpp::Any CodeGenVisitor::visitOp_sup(ifccParser::Op_supContext *context) override {
-	        string tmp0 = (string) visit(context->expr(0));
-	        string tmp1 = (string) visit(context->expr(1));
-	        assemblerText+="        movl    "+tmp0+", %edx\n";
-	        assemblerText+="        movl    "+tmp1+", %eax\n";
-		    assemblerText+="        cmpl	%edx, %eax\n";
-		    assemblerText+="        setg	%al\n";
-		    assemblerText+="        movzbl	%al, %eax\n";
-	        return string("%eax");
-	    }
+antlrcpp::Any CodeGenVisitor::visitOp_bit(ifccParser::Op_bitContext *ctx){
 
-	    antlrcpp::Any CodeGenVisitor::visitOp_inf(ifccParser::Op_infContext *context) override {
-	        string tmp0 = (string) visit(context->expr(0));
-	        string tmp1 = (string) visit(context->expr(1));
-	        assemblerText+="        movl    "+tmp0+", %edx\n";
-	        assemblerText+="        movl    "+tmp1+", %eax\n";
-		    assemblerText+="        cmpl	%edx, %eax\n";
-		    assemblerText+="        setl	%al\n";
-		    assemblerText+="        movzbl	%al, %eax\n";
-	        return string("%eax");
-	    }
+};
 
-	    antlrcpp::Any CodeGenVisitor::visitALPHANUMERIC(ifccParser::ALPHANUMERICContext *context){
-	        return string(to_string(offsets[context->ALPHANUMERIC()->getText()])+"(%rbp)");
-	    }
+// primaryexpr
+antlrcpp::Any CodeGenVisitor::visitChar(ifccParser::CharContext *ctx){
 
-	    antlrcpp::Any CodeGenVisitor::visitOp_opposite(ifccParser::Op_oppositeContext *context) override {
-	        string tmp0 = (string) visit(context->expr());
-	        assemblerText+="        movl    "+tmp0+", %eax\n";
-		    assemblerText+="        negl	%eax\n";
-	        return string("%eax");
-	    }
+};
 
-	    antlrcpp::Any CodeGenVisitor::visitOp_not(ifccParser::Op_notContext *context) override {
-	        string tmp0 = (string) visit(context->expr());
-	        assemblerText+="        cmpl	$0, "+tmp0+"\n";
-		    assemblerText+="        sete	%al\n";
-		    assemblerText+="        movzbl	%al, %eax\n";
-	        return string("%eax");
-	    }
+antlrcpp::Any CodeGenVisitor::visitVariable(ifccParser::VariableContext *ctx){
+    return string(to_string(offsets[ctx->ALPHANUMERIC()->getText()]) + "(%rbp)");
+};
+
+antlrcpp::Any CodeGenVisitor::visitInt(ifccParser::IntContext *ctx){
+
+};
 
 
-	    antlrcpp::Any CodeGenVisitor::visitAxiom(ifccParser::AxiomContext *context){
-	        return nullptr;
-	    };
+// antlrcpp::Any CodeGenVisitor::visitMinus(ifccParser::MinusContext *context)
+// {
+//     string tmp0 = (string)visit(context->expr(0));
+//     string tmp1 = (string)visit(context->expr(1));
+//     assemblerText += "        movl    " + tmp0 + ", %edx\n";
+//     assemblerText += "        movl    " + tmp1 + ", %eax\n";
+//     assemblerText += "        subl	%edx, %eax\n";
+//     // i++;
+//     // return string("#tmp"+to_string(i));
+//     return string("%eax");
+// };
 
-	    antlrcpp::Any CodeGenVisitor::visitProg(ifccParser::ProgContext *context){
-	        return nullptr;
-	    };
+// antlrcpp::Any CodeGenVisitor::visitMuldiv(ifccParser::MuldivContext *context)
+// {
+//     string tmp0 = (string)visit(context->expr(0));
+//     string tmp1 = (string)visit(context->expr(1));
+//     char op = context->OP()->getText()[0];
+//     if (op == '*')
+//     {
+//         assemblerText += "        movl    " + tmp0 + ", %edx\n";
+//         assemblerText += "        movl    " + tmp1 + ", %eax\n";
+//         assemblerText += "        imul	%edx, %eax\n";
+//     }
+//     else
+//     {
+//         assemblerText += "        movl    " + tmp0 + ", %eax\n";
+//         assemblerText += "        cltd\n";
+//         // %edx is used by the cltd command so we're gonna use %ebx instead it's a 32bits register just like %eax and %edx
+//         assemblerText += "        movl    " + tmp1 + ", %ebx\n";
+//         assemblerText += "        idivl	%ebx \n";
+//     }
+//     // i++;
+//     // return string("#tmp"+to_string(i));
+//     return string("%eax");
+// }
 
-	    antlrcpp::Any CodeGenVisitor::visitLine(ifccParser::LineContext *context){
-	        return nullptr;
-	    };
+// antlrcpp::Any CodeGenVisitor::visitCONST(ifccParser::CONSTContext *context)
+// {
+//     // i++;
+//     // return string("#tmp"+to_string(i));
+//     return string("$" + context->CONST()->getText());
+// }
 
-	    string getAssemblerText(){
-	        return assemblerText;
-	    }
+// antlrcpp::Any CodeGenVisitor::visitPlus(ifccParser::PlusContext *context)
+// {
+//     string tmp0 = (string)visit(context->expr(0));
+//     string tmp1 = (string)visit(context->expr(1));
+//     assemblerText += "        movl    " + tmp0 + ", %edx\n";
+//     assemblerText += "        movl    " + tmp1 + ", %eax\n";
+//     assemblerText += "        addl	%edx, %eax\n";
+//     // i++;
+//     // return string("#tmp"+to_string(i));
+//     return string("%eax");
+// }
 
-}
+// antlrcpp::Any CodeGenVisitor::visitOp_or(ifccParser::Op_orContext *context) override
+// {
+//     string tmp0 = (string)visit(context->expr(0));
+//     string tmp1 = (string)visit(context->expr(1));
+//     assemblerText += "        movl    " + tmp0 + ", %edx\n";
+//     assemblerText += "        movl    " + tmp1 + ", %eax\n";
+//     assemblerText += "        orl	%edx, %eax\n";
+//     // i++;
+//     // return string("#tmp"+to_string(i));
+//     return string("%eax");
+// }
 
+// antlrcpp::Any CodeGenVisitor::visitOp_and(ifccParser::Op_andContext *context) override
+// {
+//     string tmp0 = (string)visit(context->expr(0));
+//     string tmp1 = (string)visit(context->expr(1));
+//     assemblerText += "        movl    " + tmp0 + ", %edx\n";
+//     assemblerText += "        movl    " + tmp1 + ", %eax\n";
+//     assemblerText += "        andl	%edx, %eax\n";
+//     // i++;
+//     // return string("#tmp"+to_string(i));
+//     return string("%eax");
+// }
+
+// antlrcpp::Any CodeGenVisitor::visitOp_xor(ifccParser::Op_xorContext *context) override
+// {
+//     string tmp0 = (string)visit(context->expr(0));
+//     string tmp1 = (string)visit(context->expr(1));
+//     assemblerText += "        movl    " + tmp0 + ", %edx\n";
+//     assemblerText += "        movl    " + tmp1 + ", %eax\n";
+//     assemblerText += "        xorl	%edx, %eax\n";
+//     // i++;
+//     // return string("#tmp"+to_string(i));
+//     return string("%eax");
+// }
+
+// antlrcpp::Any CodeGenVisitor::visitOp_equal(ifccParser::Op_equalContext *context) override
+// {
+//     string tmp0 = (string)visit(context->expr(0));
+//     string tmp1 = (string)visit(context->expr(1));
+//     assemblerText += "        movl    " + tmp0 + ", %edx\n";
+//     assemblerText += "        movl    " + tmp1 + ", %eax\n";
+//     assemblerText += "        cmpl	%edx, %eax\n";
+//     assemblerText += "        sete	%al\n";
+//     assemblerText += "        movzbl	%al, %eax\n";
+//     return string("%eax");
+// }
+
+// antlrcpp::Any CodeGenVisitor::visitOp_not_equal(ifccParser::Op_not_equalContext *context) override
+// {
+//     string tmp0 = (string)visit(context->expr(0));
+//     string tmp1 = (string)visit(context->expr(1));
+//     assemblerText += "        movl    " + tmp0 + ", %edx\n";
+//     assemblerText += "        movl    " + tmp1 + ", %eax\n";
+//     assemblerText += "        cmpl	%edx, %eax\n";
+//     assemblerText += "        setne	%al\n";
+//     assemblerText += "        movzbl	%al, %eax\n";
+//     return string("%eax");
+// }
+
+// antlrcpp::Any CodeGenVisitor::visitOp_sup(ifccParser::Op_supContext *context) override
+// {
+//     string tmp0 = (string)visit(context->expr(0));
+//     string tmp1 = (string)visit(context->expr(1));
+//     assemblerText += "        movl    " + tmp0 + ", %edx\n";
+//     assemblerText += "        movl    " + tmp1 + ", %eax\n";
+//     assemblerText += "        cmpl	%edx, %eax\n";
+//     assemblerText += "        setg	%al\n";
+//     assemblerText += "        movzbl	%al, %eax\n";
+//     return string("%eax");
+// }
+
+// antlrcpp::Any CodeGenVisitor::visitOp_inf(ifccParser::Op_infContext *context) override
+// {
+//     string tmp0 = (string)visit(context->expr(0));
+//     string tmp1 = (string)visit(context->expr(1));
+//     assemblerText += "        movl    " + tmp0 + ", %edx\n";
+//     assemblerText += "        movl    " + tmp1 + ", %eax\n";
+//     assemblerText += "        cmpl	%edx, %eax\n";
+//     assemblerText += "        setl	%al\n";
+//     assemblerText += "        movzbl	%al, %eax\n";
+//     return string("%eax");
+// }
+
+// antlrcpp::Any CodeGenVisitor::visitALPHANUMERIC(ifccParser::ALPHANUMERICContext *context)
+// {
+//     return string(to_string(offsets[context->ALPHANUMERIC()->getText()]) + "(%rbp)");
+// }
+
+// antlrcpp::Any CodeGenVisitor::visitOp_opposite(ifccParser::Op_oppositeContext *context) override
+// {
+//     string tmp0 = (string)visit(context->expr());
+//     assemblerText += "        movl    " + tmp0 + ", %eax\n";
+//     assemblerText += "        negl	%eax\n";
+//     return string("%eax");
+// }
+
+// antlrcpp::Any CodeGenVisitor::visitOp_not(ifccParser::Op_notContext *context) override
+// {
+//     string tmp0 = (string)visit(context->expr());
+//     assemblerText += "        cmpl	$0, " + tmp0 + "\n";
+//     assemblerText += "        sete	%al\n";
+//     assemblerText += "        movzbl	%al, %eax\n";
+//     return string("%eax");
+// }
