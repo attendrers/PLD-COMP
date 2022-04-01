@@ -39,6 +39,7 @@ expr
 RETURN : 'return' ;
 INT_CONST : [-]?[0-9]+ ;
 CHAR_CONST : '\'' . '\'';
+TYPE: ('int' | 'char') ;
 COMMENT : '/*' .*? '*/' -> skip ;
 INLINECOMMENT : '//' ~[\r\n]* [\r\n] -> skip ;
 DIRECTIVE : '#' .*? '\n' -> skip ;

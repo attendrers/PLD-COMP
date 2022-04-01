@@ -1,5 +1,4 @@
 #include "CodeGenVisitor.h"
-#include "ExprVisitor.h"
 
 #include <string>
 
@@ -47,7 +46,7 @@ antlrcpp::Any CodeGenVisitor::visitProg(ifccParser::ProgContext *ctx)
 	return 0;
 }
 
-antlrcpp::Any CodeGenVisitor::visitDeclaration_intconst(ifccParser::Declaration_constContext *ctx){
+antlrcpp::Any CodeGenVisitor::visitDeclaration_intconst(ifccParser::Declaration_intconstContext *ctx){
 	// Case int a = 5 ; 
 	string varName = ctx->ALPHANUMERIC()->getText();
 	int varValue = stoi(ctx->INT_CONST()->getText());
@@ -58,7 +57,7 @@ antlrcpp::Any CodeGenVisitor::visitDeclaration_intconst(ifccParser::Declaration_
     return 0;
 }
 
-antlrcpp::Any CodeGenVisitor::visitDeclaration_charconst(ifccParser::Declaration_constContext *ctx){
+antlrcpp::Any CodeGenVisitor::visitDeclaration_charconst(ifccParser::Declaration_charconstContext *ctx){
 	// Case char a = '5' ; 
 	string varName = ctx->ALPHANUMERIC()->getText();
 	string temp = ctx->CHAR_CONST()->getText();
@@ -74,7 +73,7 @@ antlrcpp::Any CodeGenVisitor::visitDeclaration_variable(ifccParser::Declaration_
 	// Case int b = a;
 	string leftVar = ctx->ALPHANUMERIC().at(0)->getText(); 
 	string rightVar= ctx->ALPHANUMERIC().at(1)->getText();
-	int type=(ctx->TYPE()->getText()=='int')?1:0;
+	int type=(ctx->TYPE()->getText()=="int")?1:0;
 	// vars.push_back(make_pair(leftVar,Var(rightVar,type)));
 	if(type==1) offsets[leftVar] = -((i+1)*4);
 	else offsets[leftVar] = -(i+1);
@@ -95,14 +94,14 @@ antlrcpp::Any CodeGenVisitor::visitReturn(ifccParser::ReturnContext *ctx){
     return 0;
 }
 
-antlrcpp::Any CodeGenVisitor::visitReturn_intconst(ifccParser::Return_constContext *ctx) {
+antlrcpp::Any CodeGenVisitor::visitReturn_intconst(ifccParser::Return_intconstContext *ctx) {
     // Case return constant ( return 10; )
     int retval = stoi(ctx->INT_CONST()->getText());
     cout<<" 	movl	$"<<retval<<", %eax\n";
     return 0;
 }
 
-antlrcpp::Any CodeGenVisitor::visitReturn_charconst(ifccParser::Return_constContext *ctx) {
+antlrcpp::Any CodeGenVisitor::visitReturn_charconst(ifccParser::Return_charconstContext *ctx) {
     // Case return constant ( return 10; )
     int retval = stoi(ctx->CHAR_CONST()->getText());
     cout<<" 	movl	$"<<retval<<", %eax\n";
