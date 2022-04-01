@@ -114,6 +114,50 @@ public:
         return string("%eax");
     }
 
+    virtual antlrcpp::Any visitOp_equal(ifccParser::Op_equalContext *context) override {
+        string tmp0 = (string) visit(context->expr(0));
+        string tmp1 = (string) visit(context->expr(1));
+        assemblerText+="        movl    "+tmp0+", %edx\n";
+        assemblerText+="        movl    "+tmp1+", %eax\n";
+	    assemblerText+="        cmpl	%edx, %eax\n";
+	    assemblerText+="        sete	%al\n";
+	    assemblerText+="        movzbl	%al, %eax\n";
+        return string("%eax");
+    }
+
+    virtual antlrcpp::Any visitOp_not_equal(ifccParser::Op_not_equalContext *context) override {
+        string tmp0 = (string) visit(context->expr(0));
+        string tmp1 = (string) visit(context->expr(1));
+        assemblerText+="        movl    "+tmp0+", %edx\n";
+        assemblerText+="        movl    "+tmp1+", %eax\n";
+	    assemblerText+="        cmpl	%edx, %eax\n";
+	    assemblerText+="        setne	%al\n";
+	    assemblerText+="        movzbl	%al, %eax\n";
+        return string("%eax");
+    }
+
+    virtual antlrcpp::Any visitOp_sup(ifccParser::Op_supContext *context) override {
+        string tmp0 = (string) visit(context->expr(0));
+        string tmp1 = (string) visit(context->expr(1));
+        assemblerText+="        movl    "+tmp0+", %edx\n";
+        assemblerText+="        movl    "+tmp1+", %eax\n";
+	    assemblerText+="        cmpl	%edx, %eax\n";
+	    assemblerText+="        setg	%al\n";
+	    assemblerText+="        movzbl	%al, %eax\n";
+        return string("%eax");
+    }
+
+    virtual antlrcpp::Any visitOp_inf(ifccParser::Op_infContext *context) override {
+        string tmp0 = (string) visit(context->expr(0));
+        string tmp1 = (string) visit(context->expr(1));
+        assemblerText+="        movl    "+tmp0+", %edx\n";
+        assemblerText+="        movl    "+tmp1+", %eax\n";
+	    assemblerText+="        cmpl	%edx, %eax\n";
+	    assemblerText+="        setl	%al\n";
+	    assemblerText+="        movzbl	%al, %eax\n";
+        return string("%eax");
+    }
+
     virtual antlrcpp::Any visitALPHANUMERIC(ifccParser::ALPHANUMERICContext *context){
         return string(to_string(offsets[context->ALPHANUMERIC()->getText()])+"(%rbp)");
     }

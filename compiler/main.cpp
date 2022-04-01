@@ -44,6 +44,10 @@ int main(int argn, const char **argv)
   }
 
   
+  // ReadVisitor rv;
+  // rv.visit();
+  // rv.getTA
+  // rv.getOffsets
   CodeGenVisitor v;
   v.visit(tree);
 

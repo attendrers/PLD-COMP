@@ -2,10 +2,6 @@
 #include "ExprVisitor.h"
 
 #include <string>
-#include <map>
-#include <algorithm>
-
-using namespace std;
 
 class Var{
 	public:
@@ -35,92 +31,78 @@ antlrcpp::Any CodeGenVisitor::visitProg(ifccParser::ProgContext *ctx)
 		"	movq %rsp, %rbp\n\n";
 
 	
-	int retval;
-	vector<pair<string,Var>> vars;
-	unordered_map <string,int> offsets;
-	for(int i=0; i<ctx->line().size(); i++){
-		ifccParser::LineContext * current = ctx->line().at(i);
-		// We are in a declaration line
-		if(current->RETURN()==nullptr){
-			// No expr on right side
-			if(current->expr()==nullptr){
-				// Case int a = 5 ; 
-				if(current->ALPHANUMERIC().size()==1){
-					string varName = current->ALPHANUMERIC().at(0)->getText();
-					int varValue = stoi(current->CONST()->getText());
-					vars.push_back(make_pair(varName,Var(varValue)));
-					offsets[varName] = -((i+1)*4);
-					cout<<"	movl	$"<<varValue<<", "<<(-(i+1)*4)<<"(%rbp)\n";
-				}
-				// Case int b = a;
-				else if(current->ALPHANUMERIC().size()==2){
-					string leftVar = current->ALPHANUMERIC().at(0)->getText(); 
-					string rightVar= current->ALPHANUMERIC().at(1)->getText();
-					vars.push_back(make_pair(leftVar,Var(rightVar)));
-					offsets[leftVar] = -((i+1)*4);
-					cout <<"	movl	"<<offsets[leftVar]<<"(%rbp), %eax"<<"\n";
-					cout<<"		movl	%eax, "<<(-(i+1)*4)<<"(%rbp)\n";
-					
-				}
-			}
-
-			// Expr on right side
-			else{
-				string leftVar = current->ALPHANUMERIC().at(0)->getText();
-				offsets[leftVar] = -((i+1)*4);
-				ExprVisitor e(offsets);
-				cout<<"	# Expression here\n";
-				e.visit(current->expr());
-				cout<<e.getAssemblerText();
-				cout<<"	movl	%eax, "<<(-(i+1)*4)<<"(%rbp)\n";
-			}
-	
-		}
-
-		// We are in a return line
-		else{
-			// Case return constant ( return 10; )
-			if(current->CONST()!=nullptr){
-				retval = stoi(current->CONST()->getText());
-				cout<<" 	movl	$"<<retval<<", %eax\n";
-			}
-			// Case return variable ( return a; )
-			else if(current->expr()==nullptr){
-				string varName = current->ALPHANUMERIC().at(0)->getText();
-				cout<<"	movl	"<<offsets[varName]<<"(%rbp), %eax\n";
-			}
-			// Case return expression ( return a+b; )
-			else{
-				ExprVisitor e(offsets);
-				e.visit(current->expr());
-				cout<<e.getAssemblerText();
-				// Final result should be in %eax so no need to do a movl to %eax
-			}
-
-		}
+	// vector<pair<string,Var>> vars;
+	for(auto & line : ctx->line()){
+		visit(line);
 	}
 
-	// int length = vars.size();
-	
-	// Case where we want to first initialize everything and then write assembler ( could be useful next)
-
-	// for(int i=0; i<length; i++){
-	// 	Var current = vars.at(i).second;
-	// 	if(current.isSimple){
-	// 		std::cout<<"	movl	$"<<current.val<<", "<<(-(i+1)*4)<<"(%rbp)\n";
-	// 	}
-	// 	else{
-	// 		cout <<"	movl	"<<offsets[current.var]<<"(%rbp), %eax"<<"\n";
-			
-	// 		cout<<"	movl	%eax, "<<(-(i+1)*4)<<"(%rbp)\n";
-	// 	}
-	// }
-
-		std::cout<<
-		"	\n	# epilogue\n"
-		"	popq %rbp\n"
-		" 	ret\n";
+    std::cout<<
+    "	\n	# epilogue\n"
+    "	popq %rbp\n"
+    " 	ret\n";
 
 	return 0;
 }
+
+antlrcpp::Any CodeGenVisitor::visitDeclaration_const(ifccParser::Declaration_constContext *ctx){
+	// Case int a = 5 ; 
+	string varName = ctx->ALPHANUMERIC()->getText();
+	int varValue = stoi(ctx->CONST()->getText());
+	// vars.push_back(make_pair(varName,Var(varValue)));
+	offsets[varName] = -((i+1)*4);
+    i++;
+	cout<<"	movl	$"<<varValue<<", "<<offsets[varName]<<"(%rbp)\n";
+    return 0;
+}
+
+antlrcpp::Any CodeGenVisitor::visitDeclaration_variable(ifccParser::Declaration_variableContext *ctx){
+	// Case int b = a;
+	string leftVar = ctx->ALPHANUMERIC().at(0)->getText(); 
+	string rightVar= ctx->ALPHANUMERIC().at(1)->getText();
+	// vars.push_back(make_pair(leftVar,Var(rightVar)));
+	offsets[leftVar] = -((i+1)*4);
+    i++;
+	cout <<"	movl	"<<offsets[leftVar]<<"(%rbp), %eax"<<"\n";
+	cout<<"		movl	%eax, "<<offsets[rightVar]<<"(%rbp)\n";
+
+    return 0;
+}
+
+antlrcpp::Any CodeGenVisitor::visitDeclaration_expr(ifccParser::Declaration_exprContext *ctx){
+    return 0;
+}
+
+antlrcpp::Any CodeGenVisitor::visitReturn(ifccParser::ReturnContext *ctx){
+	// We are in a return line
+    visit(ctx->return_global());
+    return 0;
+}
+
+antlrcpp::Any CodeGenVisitor::visitReturn_const(ifccParser::Return_constContext *ctx) {
+    // Case return constant ( return 10; )
+    int retval = stoi(ctx->CONST()->getText());
+    cout<<" 	movl	$"<<retval<<", %eax\n";
+    return 0;
+}
+
+antlrcpp::Any CodeGenVisitor::visitReturn_variable(ifccParser::Return_variableContext *ctx) {
+    // Case return variable ( return a; )
+    string varName = ctx->ALPHANUMERIC()->getText();
+    cout<<"	movl	"<<offsets[varName]<<"(%rbp), %eax\n";
+    return 0;
+}
+
+antlrcpp::Any CodeGenVisitor::visitReturn_expr(ifccParser::Return_exprContext *ctx) {
+    // Case return expression ( return a+b; )
+    // ExprVisitor e(offsets);
+    // e.visit(current->expr());
+    // cout<<e.getAssemblerText();
+    // Final result should be in %eax so no need to do a movl to %eax
+
+    return 0;
+}
+
+
+
+
 
