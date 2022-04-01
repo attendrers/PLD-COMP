@@ -51,8 +51,8 @@ antlrcpp::Any CodeGenVisitor::visitDeclaration_intconst(ifccParser::Declaration_
 	string varName = ctx->ALPHANUMERIC()->getText();
 	int varValue = stoi(ctx->INT_CONST()->getText());
 	// vars.push_back(make_pair(varName,Var(varValue,1)));
-	offsets[varName] = -((i+1)*4);
-    i++;
+	// offsets[varName] = -((i+1)*4);
+    // i++;
 	cout<<"	movl	$"<<varValue<<", "<<offsets[varName]<<"(%rbp)\n";
     return 0;
 }
@@ -62,9 +62,9 @@ antlrcpp::Any CodeGenVisitor::visitDeclaration_charconst(ifccParser::Declaration
 	string varName = ctx->ALPHANUMERIC()->getText();
 	string temp = ctx->CHAR_CONST()->getText();
 	int varValue = (int)temp.at(1);
-	// vars.push_back(make_pair(varName,Var(varValue,0)));
-	offsets[varName] = -(i+1);
-    i++;
+	// // vars.push_back(make_pair(varName,Var(varValue,0)));
+	// offsets[varName] = -(i+1);
+    // i++;
 	cout<<"	movl	$"<<varValue<<", "<<offsets[varName]<<"(%rbp)\n";
     return 0;
 }
@@ -73,13 +73,13 @@ antlrcpp::Any CodeGenVisitor::visitDeclaration_variable(ifccParser::Declaration_
 	// Case int b = a;
 	string leftVar = ctx->ALPHANUMERIC().at(0)->getText(); 
 	string rightVar= ctx->ALPHANUMERIC().at(1)->getText();
-	int type=(ctx->TYPE()->getText()=="int")?1:0;
-	// vars.push_back(make_pair(leftVar,Var(rightVar,type)));
-	if(type==1) offsets[leftVar] = -((i+1)*4);
-	else offsets[leftVar] = -(i+1);
-    i++;
-	cout <<"	movl	"<<offsets[leftVar]<<"(%rbp), %eax"<<"\n";
-	cout<<"		movl	%eax, "<<offsets[rightVar]<<"(%rbp)\n";
+	// int type=(ctx->TYPE()->getText()=="int")?1:0;
+	// // vars.push_back(make_pair(leftVar,Var(rightVar,type)));
+	// if(type==1) offsets[leftVar] = -((i+1)*4);
+	// else offsets[leftVar] = -(i+1);
+    // i++;
+	cout <<"	movl	"<<offsets[rightVar]<<"(%rbp), %eax"<<"\n";
+	cout<<"	movl	%eax, "<<offsets[leftVar]<<"(%rbp)\n";
 
     return 0;
 }
