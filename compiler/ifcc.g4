@@ -5,15 +5,18 @@ axiom : prog ;
 prog : TYPE 'main' '(' ')' '{' line* '}' ;
 
 line
-    : TYPE ALPHANUMERIC '=' CONST ';'                 # declaration_const
+    : TYPE ALPHANUMERIC '=' INT_CONST ';'             # declaration_intconst
+    | TYPE ALPHANUMERIC '=' CHAR_CONST ';'            # declaration_charconst
     | TYPE ALPHANUMERIC '=' ALPHANUMERIC ';'          # declaration_variable
     | TYPE ALPHANUMERIC '=' expr ';'                  # declaration_expr
     | return_global                                   # return ;
 
 return_global
-    : RETURN CONST ';'                                # return_const
+    : RETURN INT_CONST ';'                            # return_intconst
+    | RETURN CHAR_CONST ';'                           # return_charconst
     | RETURN ALPHANUMERIC ';'                         # return_variable
-    | RETURN expr ';'                                 # return_expr ;
+    | RETURN expr ';'                                 # return_expr
+    ;
 
 primaryexpr
     : INT_CONST                                       #int
