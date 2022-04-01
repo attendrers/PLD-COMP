@@ -49,8 +49,8 @@ antlrcpp::Any CodeGenVisitor::visitDeclaration_const(ifccParser::Declaration_con
 	string varName = ctx->ALPHANUMERIC()->getText();
 	int varValue = stoi(ctx->CONST()->getText());
 	// vars.push_back(make_pair(varName,Var(varValue)));
-	offsets[varName] = -((i+1)*4);
-    i++;
+	// offsets[varName] = -((i+1)*4);
+    // i++;
 	cout<<"	movl	$"<<varValue<<", "<<offsets[varName]<<"(%rbp)\n";
     return 0;
 }
@@ -60,8 +60,8 @@ antlrcpp::Any CodeGenVisitor::visitDeclaration_variable(ifccParser::Declaration_
 	string leftVar = ctx->ALPHANUMERIC().at(0)->getText(); 
 	string rightVar= ctx->ALPHANUMERIC().at(1)->getText();
 	// vars.push_back(make_pair(leftVar,Var(rightVar)));
-	offsets[leftVar] = -((i+1)*4);
-    i++;
+	// offsets[leftVar] = -((i+1)*4);
+    // i++;
 	cout <<"	movl	"<<offsets[leftVar]<<"(%rbp), %eax"<<"\n";
 	cout<<"		movl	%eax, "<<offsets[rightVar]<<"(%rbp)\n";
 
