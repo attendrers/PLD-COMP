@@ -1,21 +1,23 @@
 #include "CodeGenVisitor.h"
-#include "ExprVisitor.h"
 
 #include <string>
 
 class Var{
 	public:
-		Var(string var){
+		Var(string var,int type){
 			this->var = var;
+			this->type = type;
 			isSimple = false;
 		}
 
-		Var(int val){
+		Var(int val,int type){
 			this->val = val;
+			this->type = type;
 			isSimple = true;
 		}
 		string var;
 		int val;
+		int type;//1 pour int, 0 pour char
 		bool isSimple;
 
 
@@ -44,13 +46,25 @@ antlrcpp::Any CodeGenVisitor::visitProg(ifccParser::ProgContext *ctx)
 	return 0;
 }
 
-antlrcpp::Any CodeGenVisitor::visitDeclaration_const(ifccParser::Declaration_constContext *ctx){
+antlrcpp::Any CodeGenVisitor::visitDeclaration_intconst(ifccParser::Declaration_intconstContext *ctx){
 	// Case int a = 5 ; 
 	string varName = ctx->ALPHANUMERIC()->getText();
-	int varValue = stoi(ctx->CONST()->getText());
-	// vars.push_back(make_pair(varName,Var(varValue)));
-	// offsets[varName] = -((i+1)*4);
-    // i++;
+	int varValue = stoi(ctx->INT_CONST()->getText());
+	// vars.push_back(make_pair(varName,Var(varValue,1)));
+	offsets[varName] = -((i+1)*4);
+    i++;
+	cout<<"	movl	$"<<varValue<<", "<<offsets[varName]<<"(%rbp)\n";
+    return 0;
+}
+
+antlrcpp::Any CodeGenVisitor::visitDeclaration_charconst(ifccParser::Declaration_charconstContext *ctx){
+	// Case char a = '5' ; 
+	string varName = ctx->ALPHANUMERIC()->getText();
+	string temp = ctx->CHAR_CONST()->getText();
+	int varValue = (int)temp.at(1);
+	// vars.push_back(make_pair(varName,Var(varValue,0)));
+	offsets[varName] = -(i+1);
+    i++;
 	cout<<"	movl	$"<<varValue<<", "<<offsets[varName]<<"(%rbp)\n";
     return 0;
 }
@@ -59,9 +73,11 @@ antlrcpp::Any CodeGenVisitor::visitDeclaration_variable(ifccParser::Declaration_
 	// Case int b = a;
 	string leftVar = ctx->ALPHANUMERIC().at(0)->getText(); 
 	string rightVar= ctx->ALPHANUMERIC().at(1)->getText();
-	// vars.push_back(make_pair(leftVar,Var(rightVar)));
-	// offsets[leftVar] = -((i+1)*4);
-    // i++;
+	int type=(ctx->TYPE()->getText()=="int")?1:0;
+	// vars.push_back(make_pair(leftVar,Var(rightVar,type)));
+	if(type==1) offsets[leftVar] = -((i+1)*4);
+	else offsets[leftVar] = -(i+1);
+    i++;
 	cout <<"	movl	"<<offsets[leftVar]<<"(%rbp), %eax"<<"\n";
 	cout<<"		movl	%eax, "<<offsets[rightVar]<<"(%rbp)\n";
 
@@ -78,9 +94,16 @@ antlrcpp::Any CodeGenVisitor::visitReturn(ifccParser::ReturnContext *ctx){
     return 0;
 }
 
-antlrcpp::Any CodeGenVisitor::visitReturn_const(ifccParser::Return_constContext *ctx) {
+antlrcpp::Any CodeGenVisitor::visitReturn_intconst(ifccParser::Return_intconstContext *ctx) {
     // Case return constant ( return 10; )
-    int retval = stoi(ctx->CONST()->getText());
+    int retval = stoi(ctx->INT_CONST()->getText());
+    cout<<" 	movl	$"<<retval<<", %eax\n";
+    return 0;
+}
+
+antlrcpp::Any CodeGenVisitor::visitReturn_charconst(ifccParser::Return_charconstContext *ctx) {
+    // Case return constant ( return 10; )
+    int retval = stoi(ctx->CHAR_CONST()->getText());
     cout<<" 	movl	$"<<retval<<", %eax\n";
     return 0;
 }
