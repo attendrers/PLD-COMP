@@ -48,7 +48,10 @@ int main(int argn, const char **argv)
   ReadVarsVisitor rv;
   rv.visit(tree);
   unordered_map<string,int> offsets = rv.getOffsets();
-  CodeGenVisitor v(offsets);
+  int lastVarPosition  = rv.getLastVarPosition();
+  unordered_map<string,int> types = rv.getTypes();
+
+  CodeGenVisitor v(offsets,types,lastVarPosition);
   v.visit(tree);
   // catch(const out_of_range& e ){
   //   cout <<"Error compiling"<<endl;

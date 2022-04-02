@@ -4,5 +4,5 @@ int main(){
     int c = a+b;
     int d = a+5;
     int e = a+b+10+c+4+d;
-    return c;
+    return e;
 }

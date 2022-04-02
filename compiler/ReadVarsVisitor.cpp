@@ -6,8 +6,10 @@ antlrcpp::Any ReadVarsVisitor::visitProg(ifccParser::ProgContext *ctx){
     }
 
     int length  = vars.size();
-    for(int i=0; i<length ; i++){
-        offsets[vars[i]] = -(length -i)*types[vars[i]];
+    int current = lastVarPosition;
+    for(string & var : vars){
+        offsets[var] = current;
+        current+= types[var];
     }
     return 0;
 };
@@ -18,7 +20,8 @@ antlrcpp::Any ReadVarsVisitor::visitDeclaration_intconst(ifccParser::Declaration
 
     int type=(ctx->TYPE()->getText()=="int")?4:1;
     types[varName] = type;
-    cout<<"types "<<types[varName]<<endl;
+    lastVarPosition -= type;
+
     return 0;
 };
 
@@ -27,6 +30,8 @@ antlrcpp::Any ReadVarsVisitor::visitDeclaration_charconst(ifccParser::Declaratio
     vars.push_back(varName);
     int type=(ctx->TYPE()->getText()=="int")?4:1;
     types[varName] = type;
+    lastVarPosition -= type;
+
     return 0;
 };
 
@@ -41,12 +46,17 @@ antlrcpp::Any ReadVarsVisitor::visitDeclaration_variable(ifccParser::Declaration
 
     int type=(ctx->TYPE()->getText()=="int")?4:1;
     types[leftVar] = type;
+    lastVarPosition -= type;
+
     return 0;
 };
 
 antlrcpp::Any ReadVarsVisitor::visitDeclaration_expr(ifccParser::Declaration_exprContext *ctx) {
     string varName = ctx->ALPHANUMERIC()->getText();
     vars.push_back(varName);
+    int type=(ctx->TYPE()->getText()=="int")?4:1;
+    types[varName] = type;
+    lastVarPosition -= type;
     return 0;
 };
 
@@ -62,5 +72,13 @@ antlrcpp::Any ReadVarsVisitor::visitReturn_variable(ifccParser::Return_variableC
 
 unordered_map <string,int> ReadVarsVisitor::getOffsets(){
     return offsets;
+};
+
+int ReadVarsVisitor::getLastVarPosition(){
+    return lastVarPosition;
+}
+
+unordered_map <string,int> ReadVarsVisitor::getTypes(){
+    return types;
 };
 

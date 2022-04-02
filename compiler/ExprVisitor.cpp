@@ -33,7 +33,22 @@ antlrcpp::Any CodeGenVisitor::visitOp_muldiv(ifccParser::Op_muldivContext *ctx){
 };
 
 antlrcpp::Any CodeGenVisitor::visitOp_plusmoins(ifccParser::Op_plusmoinsContext *ctx){
-    
+    // Get places of stored left/right vars
+    string tmp0 = visit(ctx->left);
+    string tmp1 = visit(ctx->right);
+    string  op = ctx->op->getText()=="+" ? "addl" : "subl";
+    // Move them to %eax and %edx
+    cout<<"        movl    " + tmp0 + ", %edx\n";
+    cout<<"        movl    " + tmp1 + ", %eax\n";
+    // Do the operation
+    cout<<"\t"<<op<<"	%edx, %eax \n";
+
+    // Put the result into a new tmp var
+    lastVarPosition-=4;
+    string place = string(to_string(lastVarPosition)+"(%rbp)");
+    cout<<"\tmovl    %eax, "<<lastVarPosition<<"(%rbp)\n";
+    // Return the place of stored result
+    return place;
 };
 
 antlrcpp::Any CodeGenVisitor::visitOp_bit(ifccParser::Op_bitContext *ctx){
@@ -50,7 +65,12 @@ antlrcpp::Any CodeGenVisitor::visitVariable(ifccParser::VariableContext *ctx){
 };
 
 antlrcpp::Any CodeGenVisitor::visitInt(ifccParser::IntContext *ctx){
-
+    // Store the const into a tmp register
+    lastVarPosition-=4;
+    int val = stoi(ctx->INT_CONST()->getText());
+    string place = string(to_string(lastVarPosition)+"(%rbp)");
+    cout<<"\tmovl    $"<<val<<", "<<lastVarPosition<<"(%rbp)\n";
+    return place;
 };
 
 

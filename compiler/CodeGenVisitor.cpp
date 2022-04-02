@@ -2,26 +2,26 @@
 
 #include <string>
 
-class Var{
-	public:
-		Var(string var,int type){
-			this->var = var;
-			this->type = type;
-			isSimple = false;
-		}
+// class Var{
+// 	public:
+// 		Var(string var,int type){
+// 			this->var = var;
+// 			this->type = type;
+// 			isSimple = false;
+// 		}
 
-		Var(int val,int type){
-			this->val = val;
-			this->type = type;
-			isSimple = true;
-		}
-		string var;
-		int val;
-		int type;//1 pour int, 0 pour char
-		bool isSimple;
+// 		Var(int val,int type){
+// 			this->val = val;
+// 			this->type = type;
+// 			isSimple = true;
+// 		}
+// 		string var;
+// 		int val;
+// 		int type;//1 pour int, 0 pour char
+// 		bool isSimple;
 
 
-};
+// };
 
 antlrcpp::Any CodeGenVisitor::visitProg(ifccParser::ProgContext *ctx) 
 {
@@ -65,7 +65,7 @@ antlrcpp::Any CodeGenVisitor::visitDeclaration_charconst(ifccParser::Declaration
 	// // vars.push_back(make_pair(varName,Var(varValue,0)));
 	// offsets[varName] = -(i+1);
     // i++;
-	cout<<"	movl	$"<<varValue<<", "<<offsets[varName]<<"(%rbp)\n";
+	cout<<"	movb	$"<<varValue<<", "<<offsets[varName]<<"(%rbp)\n";
     return 0;
 }
 
@@ -85,6 +85,13 @@ antlrcpp::Any CodeGenVisitor::visitDeclaration_variable(ifccParser::Declaration_
 }
 
 antlrcpp::Any CodeGenVisitor::visitDeclaration_expr(ifccParser::Declaration_exprContext *ctx){
+	string varName = ctx->ALPHANUMERIC()->getText();
+	string place = visit(ctx->expr());
+
+	// Can't movl (%rbp) into (%rbp) directly
+	// Put one first in %eax then move from %eax to next one
+	cout<<" 	movl	"<<place<<", %eax\n";
+	cout<<" 	movl	%eax, "<<offsets[varName]<<"(%rbp)\n";
     return 0;
 }
 
@@ -103,7 +110,8 @@ antlrcpp::Any CodeGenVisitor::visitReturn_intconst(ifccParser::Return_intconstCo
 
 antlrcpp::Any CodeGenVisitor::visitReturn_charconst(ifccParser::Return_charconstContext *ctx) {
     // Case return constant ( return 10; )
-    int retval = stoi(ctx->CHAR_CONST()->getText());
+    string temp = ctx->CHAR_CONST()->getText();
+	int retval = (int)temp.at(1);
     cout<<" 	movl	$"<<retval<<", %eax\n";
     return 0;
 }
@@ -111,7 +119,8 @@ antlrcpp::Any CodeGenVisitor::visitReturn_charconst(ifccParser::Return_charconst
 antlrcpp::Any CodeGenVisitor::visitReturn_variable(ifccParser::Return_variableContext *ctx) {
     // Case return variable ( return a; )
     string varName = ctx->ALPHANUMERIC()->getText();
-    cout<<"	movl	"<<offsets[varName]<<"(%rbp), %eax\n";
+	string op = types[varName] == 4 ? "	movl	" : "	movsbl	";
+    cout<<op<<offsets[varName]<<"(%rbp), %eax\n";
     return 0;
 }
 

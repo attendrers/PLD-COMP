@@ -11,11 +11,13 @@ class CodeGenVisitor : public ifccBaseVisitor
 
     protected:
         unordered_map <string,int> offsets;
+        unordered_map <string,int> types;
         int i;
+        int lastVarPosition;
 
 
     public:
-        CodeGenVisitor(unordered_map <string,int> & offsets): ifccBaseVisitor(),offsets(offsets),i(0){};
+        CodeGenVisitor(unordered_map <string,int> & offsets, unordered_map <string,int> types, int lastVarPosition): ifccBaseVisitor(),offsets(offsets),types(types),i(0),lastVarPosition(lastVarPosition){};
 
         CodeGenVisitor(): ifccBaseVisitor(),i(0){};
 
@@ -44,7 +46,7 @@ class CodeGenVisitor : public ifccBaseVisitor
 
         // Expressions
         
-        virtual antlrcpp::Any CodeGenVisitor::visitPar(ifccParser::ParContext *context) override;
+        virtual antlrcpp::Any visitPar(ifccParser::ParContext *context) override;
 
         virtual antlrcpp::Any visitPrExpr(ifccParser::PrExprContext *ctx) override ;
 
