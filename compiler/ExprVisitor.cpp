@@ -20,22 +20,23 @@ antlrcpp::Any CodeGenVisitor::visitOp_infsup(ifccParser::Op_infsupContext *ctx){
     cout<<"\tmovl    " + tmp0 + ", %eax\n";
     cout<<"\tcmpl    " + tmp1 + ", %eax\n";
     //comparaison in a expression
-    switch(op)
+    if(op==">=")
     {
-        case ">=":
-            cout<<"\tsetge   %al\n";
-            break;
-        case "<=":
-            cout<<"\tsetle   %al\n";
-            break;
-        case ">":
-            cout<<"\tsetg    %al\n";
-            break;
-        case "<":
-            cout<<"\tsetl    %al\n";
-            break;
-        default:
+        cout<<"\tsetge   %al\n";
     }
+    else if(op=="<=")
+    {
+        cout<<"\tsetle   %al\n";
+    }
+    else if(op==">")
+    {
+        cout<<"\tsetg    %al\n";
+    }
+    else if(op=="<")
+    {
+        cout<<"\tsetl    %al\n";
+    }
+    
     cout<<"\tmovzbl  %al, %eax\n";
     lastVarPosition-=4;
     string place = string(to_string(lastVarPosition)+"(%rbp)");
@@ -52,15 +53,13 @@ antlrcpp::Any CodeGenVisitor::visitOp_equalornot(ifccParser::Op_equalornotContex
     cout<<"\tmovl    " + tmp0 + ", %eax\n";
     cout<<"\tcmpl    " + tmp1 + ", %eax\n";
     //comparaison in a expression
-    switch(op)
+    if(op=="==")
     {
-        case "==":
-            cout<<"\tsete    %al\n";
-            break;
-        case "!=":
-            cout<<"\tsetne   %al\n";
-            break;
-        default:
+        cout<<"\tsete    %al\n";
+    }
+    else if(op=="!=")
+    {
+        cout<<"\tsetne   %al\n";
     }
     cout<<"\tmovzbl  %al, %eax\n";
     lastVarPosition-=4;
