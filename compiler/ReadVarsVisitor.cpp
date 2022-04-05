@@ -23,7 +23,8 @@ antlrcpp::Any ReadVarsVisitor::visitProg(ifccParser::ProgContext *ctx){
         }
     }
 
-    for ( auto it : vars)
+    // A corriger: mettre used et unused_vars dans functionData et itérer dessus pour chaque fonction
+    for ( auto it : functionDatas[0]->getVars())
     {
         if(!(find(used_vars.begin(), used_vars.end(), it) != used_vars.end()))
         {
