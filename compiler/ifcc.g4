@@ -12,8 +12,12 @@ line
     | TYPE ALPHANUMERIC '=' CHAR_CONST ';'            # declaration_charconst
     | TYPE ALPHANUMERIC '=' ALPHANUMERIC ';'          # declaration_variable
     | TYPE ALPHANUMERIC '=' expr ';'                  # declaration_expr
-    | funcName=ALPHANUMERIC '(' (primaryexpr ','?)* ')' ';'  # function_call
+    | TYPE ALPHANUMERIC '=' func_call ';'             # declaration_function_call
+    | func_call ';'                                   # line_function_call
     | return_global                                   # return ;
+
+func_call: 
+funcName=ALPHANUMERIC '(' (primaryexpr ','?)* ')'     # function_call ; 
 
 return_global
     : RETURN INT_CONST ';'                            # return_intconst

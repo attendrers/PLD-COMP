@@ -2,21 +2,25 @@
 
 antlrcpp::Any ReadVarsVisitor::visitProg(ifccParser::ProgContext *ctx){
     for(auto & func : ctx->func()){
+        FunctionData * fcData = new FunctionData();
+        functionDatas.push_back(fcData);
 		visit(func);
+        
         currentIndex++;
 	}
+    for(int i=0; i<functionDatas.size();i++){
+        FunctionData * currentF = functionDatas[i];
+        vector<string> vars = currentF->getVars();
+        unordered_map<string, int> types = currentF->getTypes();
+        int lastVarPosition = currentF->getLastVarPosition();
 
-    vector<string> vars = functionDatas[currentIndex].getVars();
-    unordered_map<string, int> offsets = functionDatas[currentIndex].getOffsets();
-    unordered_map<string, int> types = functionDatas[currentIndex].getTypes();
-    int lastVarPosition = functionDatas[currentIndex].getLastVarPosition();
 
-
-    int length  = vars.size();
-    int current = lastVarPosition;
-    for(string & var : vars){
-        offsets[var] = current;
-        current+= types[var];
+        int length  = vars.size();
+        int current = lastVarPosition;
+        for(string & var : vars){
+            currentF->addToOffset(var,current);
+            current+= types[var];
+        }
     }
     return 0;
 };
@@ -30,42 +34,36 @@ antlrcpp::Any ReadVarsVisitor::visitFunc(ifccParser::FuncContext *ctx){
 }
 
 antlrcpp::Any ReadVarsVisitor::visitDeclaration_intconst(ifccParser::Declaration_intconstContext *ctx) {
-    vector<string> vars = functionDatas[currentIndex].getVars();
-    unordered_map<string, int> offsets = functionDatas[currentIndex].getOffsets();
-    unordered_map<string, int> types = functionDatas[currentIndex].getTypes();
-    int lastVarPosition = functionDatas[currentIndex].getLastVarPosition();
+    FunctionData * currentF = functionDatas[currentIndex];
+
 
     string varName = ctx->ALPHANUMERIC()->getText();
-    vars.push_back(varName);
+    currentF->addToVars(varName);
 
     int type=(ctx->TYPE()->getText()=="int")?4:1;
-    types[varName] = type;
-    lastVarPosition -= type;
+    currentF->addToTypes(varName,type);    
+
+    // cout<<"type: "<<functionDatas[currentIndex]->getTypes().at(varName)<<" vs: "<<types[varName]<<endl;
+    currentF->decrementLastVarPosition(type);
 
     return 0;
 };
 
 antlrcpp::Any ReadVarsVisitor::visitDeclaration_charconst(ifccParser::Declaration_charconstContext *ctx) {
-    vector<string> vars = functionDatas[currentIndex].getVars();
-    unordered_map<string, int> offsets = functionDatas[currentIndex].getOffsets();
-    unordered_map<string, int> types = functionDatas[currentIndex].getTypes();
-    int lastVarPosition = functionDatas[currentIndex].getLastVarPosition();
+    FunctionData * currentF = functionDatas[currentIndex];
 
     string varName = ctx->ALPHANUMERIC()->getText();
-    vars.push_back(varName);
+    currentF->addToVars(varName);
     int type=(ctx->TYPE()->getText()=="int")?4:1;
-    types[varName] = type;
-    lastVarPosition -= type;
+    currentF->addToTypes(varName,type); 
+    currentF->decrementLastVarPosition(type);
 
     return 0;
 };
 
 antlrcpp::Any ReadVarsVisitor::visitDeclaration_variable(ifccParser::Declaration_variableContext *ctx) {
-
-    vector<string> vars = functionDatas[currentIndex].getVars();
-    unordered_map<string, int> offsets = functionDatas[currentIndex].getOffsets();
-    unordered_map<string, int> types = functionDatas[currentIndex].getTypes();
-    int lastVarPosition = functionDatas[currentIndex].getLastVarPosition();
+    FunctionData * currentF = functionDatas[currentIndex];
+    unordered_map<string, int> types = functionDatas[currentIndex]->getTypes();
 
     string leftVar = ctx->ALPHANUMERIC().at(0)->getText();
     string rightVar= ctx->ALPHANUMERIC().at(1)->getText();
@@ -73,36 +71,30 @@ antlrcpp::Any ReadVarsVisitor::visitDeclaration_variable(ifccParser::Declaration
     if(types[rightVar]==0){
         throw out_of_range("Undeclared variable: ("+rightVar+") at variable declaration of: ("+leftVar+")");
     }
-    vars.push_back(leftVar);
+    currentF->addToVars(leftVar);
 
     int type=(ctx->TYPE()->getText()=="int")?4:1;
-    types[leftVar] = type;
-    lastVarPosition -= type;
+    currentF->addToTypes(leftVar,type); 
+    currentF->decrementLastVarPosition(type);
 
     return 0;
 };
 
 antlrcpp::Any ReadVarsVisitor::visitDeclaration_expr(ifccParser::Declaration_exprContext *ctx) {
-    vector<string> vars = functionDatas[currentIndex].getVars();
-    unordered_map<string, int> offsets = functionDatas[currentIndex].getOffsets();
-    unordered_map<string, int> types = functionDatas[currentIndex].getTypes();
-    int lastVarPosition = functionDatas[currentIndex].getLastVarPosition();
-
+    FunctionData * currentF = functionDatas[currentIndex];
 
     string varName = ctx->ALPHANUMERIC()->getText();
-    vars.push_back(varName);
+    currentF->addToVars(varName);
+
     int type=(ctx->TYPE()->getText()=="int")?4:1;
-    types[varName] = type;
-    lastVarPosition -= type;
+    currentF->addToTypes(varName,type); 
+    currentF->decrementLastVarPosition(type);
     return 0;
 };
 
 antlrcpp::Any ReadVarsVisitor::visitReturn_variable(ifccParser::Return_variableContext *ctx) {
 
-    vector<string> vars = functionDatas[currentIndex].getVars();
-    unordered_map<string, int> offsets = functionDatas[currentIndex].getOffsets();
-    unordered_map<string, int> types = functionDatas[currentIndex].getTypes();
-    int lastVarPosition = functionDatas[currentIndex].getLastVarPosition();
+    unordered_map<string, int> types = functionDatas[currentIndex]->getTypes();
     string varName = ctx->ALPHANUMERIC()->getText();
 
     if(types[varName]==0){
@@ -111,6 +103,18 @@ antlrcpp::Any ReadVarsVisitor::visitReturn_variable(ifccParser::Return_variableC
     return 0;
     
 };
+
+antlrcpp::Any ReadVarsVisitor::visitDeclaration_function_call(ifccParser::Declaration_function_callContext *ctx){
+	FunctionData * currentF = functionDatas[currentIndex];
+
+    string varName = ctx->ALPHANUMERIC()->getText();
+    currentF->addToVars(varName);
+
+    int type=(ctx->TYPE()->getText()=="int")?4:1;
+    currentF->addToTypes(varName,type); 
+    currentF->decrementLastVarPosition(type);
+	return 0;
+}
 
 // unordered_map <string,int> ReadVarsVisitor::getOffsets(){
 //     return offsets;

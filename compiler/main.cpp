@@ -51,7 +51,7 @@ int main(int argn, const char **argv)
   // int lastVarPosition  = rv.getLastVarPosition();
   // unordered_map<string,int> types = rv.getTypes();
 
-  vector<FunctionData> functionDatas = rv.getFunctionDatas();
+  vector<FunctionData*> functionDatas = rv.getFunctionDatas();
 
   // CodeGenVisitor v(offsets,types,lastVarPosition);
   CodeGenVisitor v (functionDatas);
@@ -60,6 +60,10 @@ int main(int argn, const char **argv)
   //   cout <<"Error compiling"<<endl;
   //   cout <<e.what()<<endl;
   // }
+
+  for(auto & f:functionDatas){
+    delete f;
+  }
 
   return 0;
 }

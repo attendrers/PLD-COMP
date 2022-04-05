@@ -3,6 +3,16 @@
 #include "CodeGenVisitor.h"
 using namespace std;
 
+// Adds a place for var in the current position (-4%rbp) --> (-8 %rbp)
+// And moves it 
+string allocateTmpVar(int type,FunctionData * f,string leftVar){
+    f->decrementLastVarPosition(type);
+    int lastVarPosition = f->getLastVarPosition();
+    string place = string(to_string(lastVarPosition)+"(%rbp)");
+    cout<<"\tmovl    "<<leftVar<<", "<<lastVarPosition<<"(%rbp)\n";
+    return place;
+}
+
 antlrcpp::Any CodeGenVisitor::visitPar(ifccParser::ParContext *context)
 {
     return visit(context->expr());
@@ -38,10 +48,7 @@ antlrcpp::Any CodeGenVisitor::visitOp_infsup(ifccParser::Op_infsupContext *ctx){
     }
     
     cout<<"\tmovzbl  %al, %eax\n";
-    int lastVarPosition = functionDatas[currentIndex].getLastVarPosition();
-    lastVarPosition-=4;
-    string place = string(to_string(lastVarPosition)+"(%rbp)");
-    cout<<"\tmovl    %eax, "<<lastVarPosition<<"(%rbp)\n";
+    string place = allocateTmpVar(4,functionDatas[currentIndex],"%eax");
     //return the result of comparaison
     return place;
 };
@@ -63,10 +70,7 @@ antlrcpp::Any CodeGenVisitor::visitOp_equalornot(ifccParser::Op_equalornotContex
         cout<<"\tsetne   %al\n";
     }
     cout<<"\tmovzbl  %al, %eax\n";
-    int lastVarPosition = functionDatas[currentIndex].getLastVarPosition();
-    lastVarPosition-=4;
-    string place = string(to_string(lastVarPosition)+"(%rbp)");
-    cout<<"\tmovl    %eax, "<<lastVarPosition<<"(%rbp)\n";
+    string place = allocateTmpVar(4,functionDatas[currentIndex],"%eax");
     //return the result of comparaison
     return place;
 };
@@ -77,10 +81,7 @@ antlrcpp::Any CodeGenVisitor::visitOp_not(ifccParser::Op_notContext *ctx){
     cout<<"        sete	%al\n";
     cout<<"        movzbl	%al, %eax\n";
     // Put the result into a new tmp var
-    int lastVarPosition = functionDatas[currentIndex].getLastVarPosition();
-    lastVarPosition-=4;
-    string place = string(to_string(lastVarPosition)+"(%rbp)");
-    cout<<"\tmovl    %eax, "<<lastVarPosition<<"(%rbp)\n";
+    string place = allocateTmpVar(4,functionDatas[currentIndex],"%eax");
     // Return the place of stored result
     return place;
 
@@ -90,10 +91,7 @@ antlrcpp::Any CodeGenVisitor::visitOp_opposite(ifccParser::Op_oppositeContext *c
     string tmp0 = (string)visit(ctx->expr());
     cout<<"        movl    " + tmp0 + ", %eax\n";
     cout<<"        negl	%eax\n";
-    int lastVarPosition = functionDatas[currentIndex].getLastVarPosition();
-    lastVarPosition-=4;
-    string place = string(to_string(lastVarPosition)+"(%rbp)");
-    cout<<"\tmovl    %eax, "<<lastVarPosition<<"(%rbp)\n";
+    string place = allocateTmpVar(4,functionDatas[currentIndex],"%eax");
     // Return the place of stored result
     return place;
 };
@@ -116,10 +114,7 @@ antlrcpp::Any CodeGenVisitor::visitOp_muldiv(ifccParser::Op_muldivContext *ctx){
     }
 
     // Both operations put result in %eax, put it into new variable
-    int lastVarPosition = functionDatas[currentIndex].getLastVarPosition();
-    lastVarPosition-=4;
-    string place = string(to_string(lastVarPosition)+"(%rbp)");
-    cout<<"\tmovl    %eax, "<<lastVarPosition<<"(%rbp)\n";
+    string place = allocateTmpVar(4,functionDatas[currentIndex],"%eax");
     // Return the place of stored result
     return place;
 
@@ -137,35 +132,29 @@ antlrcpp::Any CodeGenVisitor::visitOp_plusmoins(ifccParser::Op_plusmoinsContext 
     cout<<"\t"<<op<<"	%edx, %eax \n";
 
     // Put the result into a new tmp var
-    int lastVarPosition = functionDatas[currentIndex].getLastVarPosition();
-    lastVarPosition-=4;
-    string place = string(to_string(lastVarPosition)+"(%rbp)");
-    cout<<"\tmovl    %eax, "<<lastVarPosition<<"(%rbp)\n";
+    string place = allocateTmpVar(4,functionDatas[currentIndex],"%eax");
     // Return the place of stored result
     return place;
 };
 
 antlrcpp::Any CodeGenVisitor::visitOp_bit(ifccParser::Op_bitContext *ctx){
-
+    return 0;
 };
 
 // primaryexpr
 antlrcpp::Any CodeGenVisitor::visitChar(ifccParser::CharContext *ctx){
-
+    return 0;
 };
 
 antlrcpp::Any CodeGenVisitor::visitVariable(ifccParser::VariableContext *ctx){
-    unordered_map<string, int> offsets = functionDatas[currentIndex].getOffsets();
+    unordered_map<string, int> offsets = functionDatas[currentIndex]->getOffsets();
     return string(to_string(offsets[ctx->ALPHANUMERIC()->getText()]) + "(%rbp)");
 };
 
 antlrcpp::Any CodeGenVisitor::visitInt(ifccParser::IntContext *ctx){
     // Store the const into a tmp register
-    int lastVarPosition = functionDatas[currentIndex].getLastVarPosition();
-    lastVarPosition-=4;
     int val = stoi(ctx->INT_CONST()->getText());
-    string place = string(to_string(lastVarPosition)+"(%rbp)");
-    cout<<"\tmovl    $"<<val<<", "<<lastVarPosition<<"(%rbp)\n";
+    string place = allocateTmpVar(4,functionDatas[currentIndex],string("$"+to_string(val)));
     return place;
 };
 

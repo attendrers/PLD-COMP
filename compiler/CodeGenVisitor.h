@@ -2,9 +2,8 @@
 
 #include "antlr4-runtime.h"
 #include "generated/ifccBaseVisitor.h"
+#include "FunctionData.h"
 #include <map>
-
-class FunctionData;
 
 using namespace std;
 
@@ -16,14 +15,14 @@ class CodeGenVisitor : public ifccBaseVisitor
         // unordered_map <string,int> types;
         // int i;
         // int lastVarPosition;
-        vector<FunctionData> functionDatas;
+        vector<FunctionData*> functionDatas;
         int currentIndex;
 
 
     public:
         // CodeGenVisitor(unordered_map <string,int> & offsets, unordered_map <string,int> types, int lastVarPosition): ifccBaseVisitor(),offsets(offsets),types(types),i(0),lastVarPosition(lastVarPosition){};
 
-        CodeGenVisitor(vector<FunctionData> functionDatas): ifccBaseVisitor(),functionDatas(functionDatas),currentIndex(0){}; 
+        CodeGenVisitor(vector<FunctionData*> functionDatas): ifccBaseVisitor(),functionDatas(functionDatas),currentIndex(0){}; 
 
         virtual antlrcpp::Any visitProg(ifccParser::ProgContext *ctx) override;
 
@@ -81,5 +80,9 @@ class CodeGenVisitor : public ifccBaseVisitor
         // functions
 
         virtual antlrcpp::Any visitFunction_call(ifccParser::Function_callContext *ctx) override;
+
+        virtual antlrcpp::Any visitLine_function_call(ifccParser::Line_function_callContext *ctx) override;
+
+        virtual antlrcpp::Any visitDeclaration_function_call(ifccParser::Declaration_function_callContext *ctx) override;
 
 };
