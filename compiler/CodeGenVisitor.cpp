@@ -25,24 +25,45 @@
 
 antlrcpp::Any CodeGenVisitor::visitProg(ifccParser::ProgContext *ctx) 
 {
-	std::cout<<".globl	main\n"
-		" main: \n"
+	// cout<<".globl	main\n"
+	// 	" main: \n"
 
-		"	# prologue\n"
+	// 	"	# prologue\n"
+	// 	"	pushq %rbp\n"
+	// 	"	movq %rsp, %rbp\n\n";
+
+	cout<<".globl		main\n";
+	for(auto & func : ctx->func()){
+		visit(func);
+		currentIndex++;
+	}
+
+    // cout<<
+    // "	\n	# epilogue\n"
+    // "	popq %rbp\n"
+    // " 	ret\n";
+
+	return 0;
+}
+
+antlrcpp::Any CodeGenVisitor::visitFunc(ifccParser::FuncContext *ctx){
+	string funcName = ctx->funcName->getText();
+	cout<<funcName<<":\n";
+	cout<<".LFB"<<0<<":\n";
+	cout<<"	# prologue\n"
 		"	pushq %rbp\n"
 		"	movq %rsp, %rbp\n\n";
-
 	
-	// vector<pair<string,Var>> vars;
+	// funcName == "main" && cout<<"	subq	$16, %rsp\n";
+
 	for(auto & line : ctx->line()){
 		visit(line);
 	}
 
-    std::cout<<
+	 cout<<
     "	\n	# epilogue\n"
     "	popq %rbp\n"
     " 	ret\n";
-
 	return 0;
 }
 
@@ -53,6 +74,7 @@ antlrcpp::Any CodeGenVisitor::visitDeclaration_intconst(ifccParser::Declaration_
 	// vars.push_back(make_pair(varName,Var(varValue,1)));
 	// offsets[varName] = -((i+1)*4);
     // i++;
+	unordered_map<string, int> offsets = functionDatas[currentIndex].getOffsets();
 	cout<<"	movl	$"<<varValue<<", "<<offsets[varName]<<"(%rbp)\n";
     return 0;
 }
@@ -65,6 +87,7 @@ antlrcpp::Any CodeGenVisitor::visitDeclaration_charconst(ifccParser::Declaration
 	// // vars.push_back(make_pair(varName,Var(varValue,0)));
 	// offsets[varName] = -(i+1);
     // i++;
+	unordered_map<string, int> offsets = functionDatas[currentIndex].getOffsets();
 	cout<<"	movb	$"<<varValue<<", "<<offsets[varName]<<"(%rbp)\n";
     return 0;
 }
@@ -78,6 +101,7 @@ antlrcpp::Any CodeGenVisitor::visitDeclaration_variable(ifccParser::Declaration_
 	// if(type==1) offsets[leftVar] = -((i+1)*4);
 	// else offsets[leftVar] = -(i+1);
     // i++;
+	unordered_map<string, int> offsets = functionDatas[currentIndex].getOffsets();
 	cout <<"	movl	"<<offsets[rightVar]<<"(%rbp), %eax"<<"\n";
 	cout<<"	movl	%eax, "<<offsets[leftVar]<<"(%rbp)\n";
 
@@ -88,6 +112,7 @@ antlrcpp::Any CodeGenVisitor::visitDeclaration_expr(ifccParser::Declaration_expr
 	string varName = ctx->ALPHANUMERIC()->getText();
 	string place = visit(ctx->expr());
 
+	unordered_map<string, int> offsets = functionDatas[currentIndex].getOffsets();
 	// Can't movl (%rbp) into (%rbp) directly
 	// Put one first in %eax then move from %eax to next one
 	cout<<" 	movl	"<<place<<", %eax\n";
@@ -119,6 +144,8 @@ antlrcpp::Any CodeGenVisitor::visitReturn_charconst(ifccParser::Return_charconst
 antlrcpp::Any CodeGenVisitor::visitReturn_variable(ifccParser::Return_variableContext *ctx) {
     // Case return variable ( return a; )
     string varName = ctx->ALPHANUMERIC()->getText();
+	unordered_map<string, int> offsets = functionDatas[currentIndex].getOffsets();
+	unordered_map<string, int> types = functionDatas[currentIndex].getTypes();
 	string op = types[varName] == 4 ? "	movl	" : "	movsbl	";
     cout<<op<<offsets[varName]<<"(%rbp), %eax\n";
     return 0;
@@ -131,6 +158,14 @@ antlrcpp::Any CodeGenVisitor::visitReturn_expr(ifccParser::Return_exprContext *c
     return 0;
 }
 
+antlrcpp::Any CodeGenVisitor::visitFunction_call(ifccParser::Function_callContext *ctx){
+    cout<<"		call	"<<ctx->funcName->getText()<<"\n";
+	// Params of function
+	for(auto & param : ctx->primaryexpr()){
+		// cout<<param->getText()<<",";
+	}
+	return 0;
+}
 
 
 

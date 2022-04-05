@@ -38,6 +38,7 @@ antlrcpp::Any CodeGenVisitor::visitOp_infsup(ifccParser::Op_infsupContext *ctx){
     }
     
     cout<<"\tmovzbl  %al, %eax\n";
+    int lastVarPosition = functionDatas[currentIndex].getLastVarPosition();
     lastVarPosition-=4;
     string place = string(to_string(lastVarPosition)+"(%rbp)");
     cout<<"\tmovl    %eax, "<<lastVarPosition<<"(%rbp)\n";
@@ -62,6 +63,7 @@ antlrcpp::Any CodeGenVisitor::visitOp_equalornot(ifccParser::Op_equalornotContex
         cout<<"\tsetne   %al\n";
     }
     cout<<"\tmovzbl  %al, %eax\n";
+    int lastVarPosition = functionDatas[currentIndex].getLastVarPosition();
     lastVarPosition-=4;
     string place = string(to_string(lastVarPosition)+"(%rbp)");
     cout<<"\tmovl    %eax, "<<lastVarPosition<<"(%rbp)\n";
@@ -75,6 +77,7 @@ antlrcpp::Any CodeGenVisitor::visitOp_not(ifccParser::Op_notContext *ctx){
     cout<<"        sete	%al\n";
     cout<<"        movzbl	%al, %eax\n";
     // Put the result into a new tmp var
+    int lastVarPosition = functionDatas[currentIndex].getLastVarPosition();
     lastVarPosition-=4;
     string place = string(to_string(lastVarPosition)+"(%rbp)");
     cout<<"\tmovl    %eax, "<<lastVarPosition<<"(%rbp)\n";
@@ -87,6 +90,7 @@ antlrcpp::Any CodeGenVisitor::visitOp_opposite(ifccParser::Op_oppositeContext *c
     string tmp0 = (string)visit(ctx->expr());
     cout<<"        movl    " + tmp0 + ", %eax\n";
     cout<<"        negl	%eax\n";
+    int lastVarPosition = functionDatas[currentIndex].getLastVarPosition();
     lastVarPosition-=4;
     string place = string(to_string(lastVarPosition)+"(%rbp)");
     cout<<"\tmovl    %eax, "<<lastVarPosition<<"(%rbp)\n";
@@ -112,6 +116,7 @@ antlrcpp::Any CodeGenVisitor::visitOp_muldiv(ifccParser::Op_muldivContext *ctx){
     }
 
     // Both operations put result in %eax, put it into new variable
+    int lastVarPosition = functionDatas[currentIndex].getLastVarPosition();
     lastVarPosition-=4;
     string place = string(to_string(lastVarPosition)+"(%rbp)");
     cout<<"\tmovl    %eax, "<<lastVarPosition<<"(%rbp)\n";
@@ -132,6 +137,7 @@ antlrcpp::Any CodeGenVisitor::visitOp_plusmoins(ifccParser::Op_plusmoinsContext 
     cout<<"\t"<<op<<"	%edx, %eax \n";
 
     // Put the result into a new tmp var
+    int lastVarPosition = functionDatas[currentIndex].getLastVarPosition();
     lastVarPosition-=4;
     string place = string(to_string(lastVarPosition)+"(%rbp)");
     cout<<"\tmovl    %eax, "<<lastVarPosition<<"(%rbp)\n";
@@ -149,11 +155,13 @@ antlrcpp::Any CodeGenVisitor::visitChar(ifccParser::CharContext *ctx){
 };
 
 antlrcpp::Any CodeGenVisitor::visitVariable(ifccParser::VariableContext *ctx){
+    unordered_map<string, int> offsets = functionDatas[currentIndex].getOffsets();
     return string(to_string(offsets[ctx->ALPHANUMERIC()->getText()]) + "(%rbp)");
 };
 
 antlrcpp::Any CodeGenVisitor::visitInt(ifccParser::IntContext *ctx){
     // Store the const into a tmp register
+    int lastVarPosition = functionDatas[currentIndex].getLastVarPosition();
     lastVarPosition-=4;
     int val = stoi(ctx->INT_CONST()->getText());
     string place = string(to_string(lastVarPosition)+"(%rbp)");
