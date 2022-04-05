@@ -19,16 +19,19 @@ return_global
     ;
 
 bloc
-    : '{' line* '}';                                  # bloc
+    : '{' line* '}'                                   # bloc
+    ;
 
 condition
     : left=expr op=('<'|'>'|'<='|'>=') right=expr     # comp_infsup
     | left=expr op=('=='|'!=') right=expr             # comp_equalornot
+    ;
 
 ifStatement
-    : left='if' '(' condition ')' bloc;
+    : left='if' '(' condition ')' bloc                # if_noelse
     | left='if' '(' condition ')' bloc
-      right='else' bloc;
+      right='else' bloc                               # if_else
+    ;
 
 primaryexpr
     : INT_CONST                                       #int
