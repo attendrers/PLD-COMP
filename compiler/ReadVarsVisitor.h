@@ -12,6 +12,8 @@ class ReadVarsVisitor : public ifccBaseVisitor
         unordered_map <string,int> offsets;
         unordered_map <string,int> types;
         vector<string> vars;
+        vector<string> used_vars;
+        vector<string> not_used;
         int lastVarPosition;
 
     public:
@@ -28,6 +30,8 @@ class ReadVarsVisitor : public ifccBaseVisitor
         virtual antlrcpp::Any visitDeclaration_expr(ifccParser::Declaration_exprContext *ctx) override ;
 
         virtual antlrcpp::Any visitReturn_variable(ifccParser::Return_variableContext *ctx) override ;
+
+        virtual antlrcpp::Any visitVariable(ifccParser::VariableContext *ctx) override;
 
         unordered_map <string,int> getOffsets();
 
