@@ -26,9 +26,9 @@ condition
     | left=expr op=('=='|'!=') right=expr             # comp_equalornot
 
 ifStatement
-    : left='if' '(' condition ')' bloc
-      (left='else if' '(' condition ')' bloc)*
-      (left='else' bloc)+;
+    : left='if' '(' condition ')' bloc;
+    | left='if' '(' condition ')' bloc
+      right='else' bloc;
 
 primaryexpr
     : INT_CONST                                       #int
