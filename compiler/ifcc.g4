@@ -11,6 +11,7 @@ line
     | TYPE ALPHANUMERIC '=' CHAR_CONST ';'                 # declaration_charconst
     | TYPE ALPHANUMERIC '=' ALPHANUMERIC ';'               # declaration_variable
     | TYPE ALPHANUMERIC '=' expr ';'                       # declaration_expr
+    | ifstatement                                          # statement_if
     | return_global                                        # return ;
 
 return_global
@@ -25,7 +26,13 @@ condition
     | left=expr op=('=='|'!=') right=expr                   # comp_equalornot
     ;
 
+ifstatement
+    : 'if' '(' condition ')' bloc elsebloc;
 
+elsebloc
+    : 'else' bloc                                          #ifelse
+    |                                                      #noelse
+    ;
 
 primaryexpr
     : INT_CONST                                            #int
