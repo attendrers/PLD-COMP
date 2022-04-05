@@ -18,6 +18,18 @@ return_global
     | RETURN expr ';'                                 # return_expr
     ;
 
+bloc
+    : '{' line* '}';                                  # bloc
+
+condition
+    : left=expr op=('<'|'>'|'<='|'>=') right=expr     # comp_infsup
+    | left=expr op=('=='|'!=') right=expr             # comp_equalornot
+
+ifStatement
+    : left='if' '(' condition ')' bloc
+      (left='else if' '(' condition ')' bloc)*
+      (left='else' bloc)+;
+
 primaryexpr
     : INT_CONST                                       #int
     | CHAR_CONST                                      #char
