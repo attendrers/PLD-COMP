@@ -13,11 +13,61 @@ antlrcpp::Any CodeGenVisitor::visitPrExpr(ifccParser::PrExprContext *ctx){
 };
 
 antlrcpp::Any CodeGenVisitor::visitOp_infsup(ifccParser::Op_infsupContext *ctx){
-
+    // Get places of stored left/right vars
+    string tmp0 = visit(ctx->left);
+    string tmp1 = visit(ctx->right);
+    string  op = ctx->op->getText();
+    cout<<"\tmovl    " + tmp0 + ", %eax\n";
+    cout<<"\tcmpl    " + tmp1 + ", %eax\n";
+    //comparaison in a expression
+    switch(op)
+    {
+        case ">=":
+            cout<<"\tsetge   %al\n";
+            break;
+        case "<=":
+            cout<<"\tsetle   %al\n";
+            break;
+        case ">":
+            cout<<"\tsetg    %al\n";
+            break;
+        case "<":
+            cout<<"\tsetl    %al\n";
+            break;
+        default:
+    }
+    cout<<"\tmovzbl  %al, %eax\n";
+    lastVarPosition-=4;
+    string place = string(to_string(lastVarPosition)+"(%rbp)");
+    cout<<"\tmovl    %eax, "<<lastVarPosition<<"(%rbp)\n";
+    //return the result of comparaison
+    return place;
 };
 
 antlrcpp::Any CodeGenVisitor::visitOp_equalornot(ifccParser::Op_equalornotContext *ctx){
-
+    // Get places of stored left/right vars
+    string tmp0 = visit(ctx->left);
+    string tmp1 = visit(ctx->right);
+    string  op = ctx->op->getText();
+    cout<<"\tmovl    " + tmp0 + ", %eax\n";
+    cout<<"\tcmpl    " + tmp1 + ", %eax\n";
+    //comparaison in a expression
+    switch(op)
+    {
+        case "==":
+            cout<<"\tsete    %al\n";
+            break;
+        case "!=":
+            cout<<"\tsetne   %al\n";
+            break;
+        default:
+    }
+    cout<<"\tmovzbl  %al, %eax\n";
+    lastVarPosition-=4;
+    string place = string(to_string(lastVarPosition)+"(%rbp)");
+    cout<<"\tmovl    %eax, "<<lastVarPosition<<"(%rbp)\n";
+    //return the result of comparaison
+    return place;
 };
 
 antlrcpp::Any CodeGenVisitor::visitOp_not(ifccParser::Op_notContext *ctx){
