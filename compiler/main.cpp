@@ -9,6 +9,7 @@
 #include "generated/ifccBaseVisitor.h"
 
 #include "CodeGenVisitor.h"
+#include "ReadVarsVisitor.h"
 
 using namespace antlr4;
 using namespace std;
@@ -44,8 +45,18 @@ int main(int argn, const char **argv)
   }
 
   
-  CodeGenVisitor v;
+  ReadVarsVisitor rv;
+  rv.visit(tree);
+  unordered_map<string,int> offsets = rv.getOffsets();
+  int lastVarPosition  = rv.getLastVarPosition();
+  unordered_map<string,int> types = rv.getTypes();
+
+  CodeGenVisitor v(offsets,types,lastVarPosition);
   v.visit(tree);
+  // catch(const out_of_range& e ){
+  //   cout <<"Error compiling"<<endl;
+  //   cout <<e.what()<<endl;
+  // }
 
   return 0;
 }

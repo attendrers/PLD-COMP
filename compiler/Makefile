@@ -12,7 +12,7 @@ all: ifcc
 
 ##########################################
 # link together all pieces of our compiler 
-OBJECTS=build/main.o build/CodeGenVisitor.o build/ifccBaseVisitor.o build/ifccLexer.o build/ifccVisitor.o build/ifccParser.o 
+OBJECTS=build/main.o build/ReadVarsVisitor.o build/CodeGenVisitor.o build/ExprVisitor.o build/ifccBaseVisitor.o build/ifccLexer.o build/ifccVisitor.o build/ifccParser.o 
 
 ifcc: $(OBJECTS)
 	@mkdir -p build
@@ -22,13 +22,15 @@ ifcc: $(OBJECTS)
 # compile our hand-writen C++ code: main(), CodeGenVisitor, etc.
 build/%.o: %.cpp generated/ifccParser.cpp
 	@mkdir -p build
-	$(CC) $(CCFLAGS) -o $@ $< 
+	$(CC) $(CCFLAGS) -MMD  -o $@ $< 
 
 ##########################################
 # compile all the antlr-generated C++
 build/%.o: generated/%.cpp
 	@mkdir -p build
-	$(CC) $(CCFLAGS) -o $@ $< 
+	$(CC) $(CCFLAGS) -MMD  -o $@ $< 
+
+-include build/*.d
 
 ##########################################
 # generate the C++ implementation of our Lexer/Parser/Visitor
@@ -55,6 +57,11 @@ gui:
 
 ##########################################
 # delete all machine-generated files
-clean:
+clean clear:
 	rm -rf build generated
 	rm -f ifcc
+
+test:
+	cd ../tests && python3 ifcc-test.py testfiles;
+	
+

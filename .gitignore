@@ -6,3 +6,9 @@ antlr.tmp
 /compiler/a.out
 /compiler/ifcc
 /compiler/runmake_ubuntu.sh
+/compiler/*.o
+/compiler/build
+/compiler/generated
+/compiler/.antlr
+/tests/ifcc-test-output
+.vscode

@@ -2,23 +2,52 @@ grammar ifcc;
 
 axiom : prog ;
 
-prog : 'int' 'main' '(' ')' '{' line* '}' ;
+prog : TYPE 'main' '(' ')' '{' line* '}' ;
 
-line: 'int' ALPHANUMERIC '=' CONST ';'
-| 'int' ALPHANUMERIC '=' ALPHANUMERIC ';'
-| RETURN CONST ';' ;
+line
+    : TYPE ALPHANUMERIC '=' INT_CONST ';'             # declaration_intconst
+    | TYPE ALPHANUMERIC '=' CHAR_CONST ';'            # declaration_charconst
+    | TYPE ALPHANUMERIC '=' ALPHANUMERIC ';'          # declaration_variable
+    | TYPE ALPHANUMERIC '=' expr ';'                  # declaration_expr
+    | return_global                                   # return ;
 
-expr: expr '*' expr # mult
-| expr '+' expr # plus
-| expr '/' expr # div
-| expr '-' expr # minus
-| CONST # CONST
-| '(' expr ')'  # par ;
+return_global
+    : RETURN INT_CONST ';'                            # return_intconst
+    | RETURN CHAR_CONST ';'                           # return_charconst
+    | RETURN ALPHANUMERIC ';'                         # return_variable
+    | RETURN expr ';'                                 # return_expr
+    ;
 
+primaryexpr
+    : INT_CONST                                       #int
+    | CHAR_CONST                                      #char
+    | ALPHANUMERIC                                    #variable
+    ;
+
+expr
+    : '(' expr ')'                                    # par
+    | primaryexpr                                     # prExpr
+    | '!' expr                                        # op_not
+    | '-' expr                                        # op_opposite
+    | left=expr op=('*'|'/') right=expr               # op_muldiv
+    | left=expr op=('+'|'-') right=expr               # op_plusmoins
+    | left=expr op=('<'|'>'|'<='|'>=') right=expr     # op_infsup
+    | left=expr op=('=='|'!=') right=expr             # op_equalornot
+    | left=expr op=('&'|'^'|'|') right=expr           # op_bit
+    ;
 
 RETURN : 'return' ;
-CONST : [0-9]+ ;
+INT_CONST : [-]?[0-9]+ ;
+CHAR_CONST : '\'' . '\'';
+TYPE: ('int' | 'char') ;
 COMMENT : '/*' .*? '*/' -> skip ;
+INLINECOMMENT : '//' ~[\r\n]* [\r\n] -> skip ;
 DIRECTIVE : '#' .*? '\n' -> skip ;
-ALPHANUMERIC: [a-zA-Z] [a-zA-Z0-9]*;
 WS    : [ \t\r\n] -> channel(HIDDEN);
+ALPHANUMERIC: [_a-zA-Z] [_a-zA-Z0-9]*;
+
+
+
+
+
+
