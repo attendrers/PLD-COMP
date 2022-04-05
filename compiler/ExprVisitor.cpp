@@ -21,11 +21,28 @@ antlrcpp::Any CodeGenVisitor::visitOp_equalornot(ifccParser::Op_equalornotContex
 };
 
 antlrcpp::Any CodeGenVisitor::visitOp_not(ifccParser::Op_notContext *ctx){
+    string tmp0 = (string)visit(ctx->expr());
+    cout<<"        cmpl	$0, " + tmp0 + "\n";
+    cout<<"        sete	%al\n";
+    cout<<"        movzbl	%al, %eax\n";
+    // Put the result into a new tmp var
+    lastVarPosition-=4;
+    string place = string(to_string(lastVarPosition)+"(%rbp)");
+    cout<<"\tmovl    %eax, "<<lastVarPosition<<"(%rbp)\n";
+    // Return the place of stored result
+    return place;
 
 };
 
 antlrcpp::Any CodeGenVisitor::visitOp_opposite(ifccParser::Op_oppositeContext *ctx){
-
+    string tmp0 = (string)visit(ctx->expr());
+    cout<<"        movl    " + tmp0 + ", %eax\n";
+    cout<<"        negl	%eax\n";
+    lastVarPosition-=4;
+    string place = string(to_string(lastVarPosition)+"(%rbp)");
+    cout<<"\tmovl    %eax, "<<lastVarPosition<<"(%rbp)\n";
+    // Return the place of stored result
+    return place;
 };
 
 antlrcpp::Any CodeGenVisitor::visitOp_muldiv(ifccParser::Op_muldivContext *ctx){
@@ -41,17 +58,17 @@ antlrcpp::Any CodeGenVisitor::visitOp_muldiv(ifccParser::Op_muldivContext *ctx){
     else{
         // move left to eax
         cout<<"        movl    " + tmp0 + ", %eax\n";
-        cout<<" cltd\n";
-        cout<<"\t idivl   "<<tmp1;
+        cout<<"\t cltd\n";
+        cout<<"\t idivl   "<<tmp1<<"\n";
     }
 
+    // Both operations put result in %eax, put it into new variable
     lastVarPosition-=4;
     string place = string(to_string(lastVarPosition)+"(%rbp)");
     cout<<"\tmovl    %eax, "<<lastVarPosition<<"(%rbp)\n";
     // Return the place of stored result
     return place;
 
-    // Both operations put result in %eax, put it into new variable
 };
 
 antlrcpp::Any CodeGenVisitor::visitOp_plusmoins(ifccParser::Op_plusmoinsContext *ctx){
@@ -150,13 +167,6 @@ antlrcpp::Any CodeGenVisitor::visitInt(ifccParser::IntContext *ctx){
 //     // return string("#tmp"+to_string(i));
 //     return string("%eax");
 // }
-int main(){
-    int a = 5;
-    int b = 2;
-    int c = 1;
-    int delta = b*b - 4*a*c;
-    return delta;
-}
 // antlrcpp::Any CodeGenVisitor::visitOp_or(ifccParser::Op_orContext *context) override
 // {
 //     string tmp0 = (string)visit(context->expr(0));

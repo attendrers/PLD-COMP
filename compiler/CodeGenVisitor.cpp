@@ -125,11 +125,8 @@ antlrcpp::Any CodeGenVisitor::visitReturn_variable(ifccParser::Return_variableCo
 }
 
 antlrcpp::Any CodeGenVisitor::visitReturn_expr(ifccParser::Return_exprContext *ctx) {
-    // Case return expression ( return a+b; )
-    // ExprVisitor e(offsets);
-    // e.visit(current->expr());
-    // cout<<e.getAssemblerText();
-    // Final result should be in %eax so no need to do a movl to %eax
+    string place = visit(ctx->expr());
+	cout <<"	movl	"<<place<<", %eax\n";
 
     return 0;
 }
