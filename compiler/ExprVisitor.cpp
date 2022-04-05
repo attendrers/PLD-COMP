@@ -29,7 +29,29 @@ antlrcpp::Any CodeGenVisitor::visitOp_opposite(ifccParser::Op_oppositeContext *c
 };
 
 antlrcpp::Any CodeGenVisitor::visitOp_muldiv(ifccParser::Op_muldivContext *ctx){
+    // Get places of stored left/right vars
+    string tmp0 = visit(ctx->left);
+    string tmp1 = visit(ctx->right);
 
+    if(ctx->op->getText()=="*"){
+        // move right to eax
+        cout<<"        movl    " + tmp1 + ", %eax\n";
+        cout<<"\t imull   "<<tmp0<<", %eax\n";
+    }
+    else{
+        // move left to eax
+        cout<<"        movl    " + tmp0 + ", %eax\n";
+        cout<<" cltd\n";
+        cout<<"\t idivl   "<<tmp1;
+    }
+
+    lastVarPosition-=4;
+    string place = string(to_string(lastVarPosition)+"(%rbp)");
+    cout<<"\tmovl    %eax, "<<lastVarPosition<<"(%rbp)\n";
+    // Return the place of stored result
+    return place;
+
+    // Both operations put result in %eax, put it into new variable
 };
 
 antlrcpp::Any CodeGenVisitor::visitOp_plusmoins(ifccParser::Op_plusmoinsContext *ctx){
@@ -38,8 +60,8 @@ antlrcpp::Any CodeGenVisitor::visitOp_plusmoins(ifccParser::Op_plusmoinsContext 
     string tmp1 = visit(ctx->right);
     string  op = ctx->op->getText()=="+" ? "addl" : "subl";
     // Move them to %eax and %edx
-    cout<<"        movl    " + tmp0 + ", %edx\n";
-    cout<<"        movl    " + tmp1 + ", %eax\n";
+    cout<<"        movl    " + tmp1 + ", %edx\n";
+    cout<<"        movl    " + tmp0 + ", %eax\n";
     // Do the operation
     cout<<"\t"<<op<<"	%edx, %eax \n";
 
@@ -128,7 +150,13 @@ antlrcpp::Any CodeGenVisitor::visitInt(ifccParser::IntContext *ctx){
 //     // return string("#tmp"+to_string(i));
 //     return string("%eax");
 // }
-
+int main(){
+    int a = 5;
+    int b = 2;
+    int c = 1;
+    int delta = b*b - 4*a*c;
+    return delta;
+}
 // antlrcpp::Any CodeGenVisitor::visitOp_or(ifccParser::Op_orContext *context) override
 // {
 //     string tmp0 = (string)visit(context->expr(0));
