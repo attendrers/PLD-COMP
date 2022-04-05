@@ -15,6 +15,8 @@ protected:
     // unordered_map<string, int> types;
     // vector<string> vars;
     vector<FunctionData*> functionDatas;
+    vector<string> used_vars;
+    vector<string> not_used;
     // int lastVarPosition;
     int currentIndex;
 
@@ -36,10 +38,12 @@ public:
     virtual antlrcpp::Any visitReturn_variable(ifccParser::Return_variableContext *ctx) override;
 
     virtual antlrcpp::Any visitDeclaration_function_call(ifccParser::Declaration_function_callContext *ctx) override;
+    
+    virtual antlrcpp::Any visitVariable(ifccParser::VariableContext *ctx) override;
 
     vector<FunctionData*> getFunctionDatas(){
         return functionDatas;
-    }
+    }     
 
     // unordered_map<string, int> getOffsets();
 

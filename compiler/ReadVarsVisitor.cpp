@@ -22,6 +22,20 @@ antlrcpp::Any ReadVarsVisitor::visitProg(ifccParser::ProgContext *ctx){
             current+= types[var];
         }
     }
+
+    for ( auto it : vars)
+    {
+        if(!(find(used_vars.begin(), used_vars.end(), it) != used_vars.end()))
+        {
+            not_used.push_back(it);
+        }
+    }
+
+    if (not_used.size() != 0)
+    {
+        cout << "#Warning : (" << not_used.size() << ") not used" << endl;
+    }
+
     return 0;
 };
 
@@ -72,6 +86,7 @@ antlrcpp::Any ReadVarsVisitor::visitDeclaration_variable(ifccParser::Declaration
         throw out_of_range("Undeclared variable: ("+rightVar+") at variable declaration of: ("+leftVar+")");
     }
     currentF->addToVars(leftVar);
+    used_vars.push_back(rightVar);
 
     int type=(ctx->TYPE()->getText()=="int")?4:1;
     currentF->addToTypes(leftVar,type); 
@@ -100,6 +115,9 @@ antlrcpp::Any ReadVarsVisitor::visitReturn_variable(ifccParser::Return_variableC
     if(types[varName]==0){
         throw out_of_range("Undeclared variable: ("+varName+") at final return");
     }
+
+    used_vars.push_back(varName);
+
     return 0;
     
 };
@@ -110,10 +128,16 @@ antlrcpp::Any ReadVarsVisitor::visitDeclaration_function_call(ifccParser::Declar
     string varName = ctx->ALPHANUMERIC()->getText();
     currentF->addToVars(varName);
 
+
     int type=(ctx->TYPE()->getText()=="int")?4:1;
     currentF->addToTypes(varName,type); 
     currentF->decrementLastVarPosition(type);
 	return 0;
+}
+
+antlrcpp::Any ReadVarsVisitor::visitVariable(ifccParser::VariableContext *ctx){
+    string varName = ctx->ALPHANUMERIC()->getText();
+    used_vars.push_back(varName);
 }
 
 // unordered_map <string,int> ReadVarsVisitor::getOffsets(){
