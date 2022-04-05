@@ -2,6 +2,7 @@
 
 #include "antlr4-runtime.h"
 #include "generated/ifccBaseVisitor.h"
+#include "FunctionData.h"
 #include <map>
 
 using namespace std;
@@ -10,18 +11,22 @@ class CodeGenVisitor : public ifccBaseVisitor
 {
 
     protected:
-        unordered_map <string,int> offsets;
-        unordered_map <string,int> types;
-        int i;
-        int lastVarPosition;
+        // unordered_map <string,int> offsets;
+        // unordered_map <string,int> types;
+        // int i;
+        // int lastVarPosition;
+        vector<FunctionData*> functionDatas;
+        int currentIndex;
 
 
     public:
-        CodeGenVisitor(unordered_map <string,int> & offsets, unordered_map <string,int> types, int lastVarPosition): ifccBaseVisitor(),offsets(offsets),types(types),i(0),lastVarPosition(lastVarPosition){};
+        // CodeGenVisitor(unordered_map <string,int> & offsets, unordered_map <string,int> types, int lastVarPosition): ifccBaseVisitor(),offsets(offsets),types(types),i(0),lastVarPosition(lastVarPosition){};
 
-        CodeGenVisitor(): ifccBaseVisitor(),i(0){};
+        CodeGenVisitor(vector<FunctionData*> functionDatas): ifccBaseVisitor(),functionDatas(functionDatas),currentIndex(0){}; 
 
         virtual antlrcpp::Any visitProg(ifccParser::ProgContext *ctx) override;
+
+        virtual antlrcpp::Any visitFunc(ifccParser::FuncContext *ctx) override;
 
         // Declarations
         virtual antlrcpp::Any visitDeclaration_intconst(ifccParser::Declaration_intconstContext *ctx) override ;
@@ -71,5 +76,13 @@ class CodeGenVisitor : public ifccBaseVisitor
         virtual antlrcpp::Any visitChar(ifccParser::CharContext *ctx) override ;
 
         virtual antlrcpp::Any visitVariable(ifccParser::VariableContext *ctx) override ;
+
+        // functions
+
+        virtual antlrcpp::Any visitFunction_call(ifccParser::Function_callContext *ctx) override;
+
+        virtual antlrcpp::Any visitLine_function_call(ifccParser::Line_function_callContext *ctx) override;
+
+        virtual antlrcpp::Any visitDeclaration_function_call(ifccParser::Declaration_function_callContext *ctx) override;
 
 };

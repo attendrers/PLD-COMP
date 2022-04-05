@@ -2,17 +2,25 @@ grammar ifcc;
 
 axiom : prog ;
 
-prog : TYPE 'main' '(' ')' '{' line* '}' ;
+
+prog : (func*);
+
+func: (TYPE|'void') funcName=ALPHANUMERIC '(' ')' '{' line* '}';
 
 bloc : '{' line* '}';
 
 line
-    : TYPE ALPHANUMERIC '=' INT_CONST ';'                  # declaration_intconst
-    | TYPE ALPHANUMERIC '=' CHAR_CONST ';'                 # declaration_charconst
-    | TYPE ALPHANUMERIC '=' ALPHANUMERIC ';'               # declaration_variable
-    | TYPE ALPHANUMERIC '=' expr ';'                       # declaration_expr
-    | ifstatement                                          # statement_if
-    | return_global                                        # return ;
+    : TYPE ALPHANUMERIC '=' INT_CONST ';'             # declaration_intconst
+    | TYPE ALPHANUMERIC '=' CHAR_CONST ';'            # declaration_charconst
+    | TYPE ALPHANUMERIC '=' ALPHANUMERIC ';'          # declaration_variable
+    | TYPE ALPHANUMERIC '=' expr ';'                  # declaration_expr
+    | TYPE ALPHANUMERIC '=' func_call ';'             # declaration_function_call
+    | func_call ';'                                   # line_function_call
+    | ifstatement                                     # statement_if
+    | return_global                                   # return ;
+
+func_call: 
+funcName=ALPHANUMERIC '(' (primaryexpr ','?)* ')'     # function_call ; 
 
 return_global
     : RETURN INT_CONST ';'                                  # return_intconst

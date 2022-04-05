@@ -47,16 +47,23 @@ int main(int argn, const char **argv)
   
   ReadVarsVisitor rv;
   rv.visit(tree);
-  unordered_map<string,int> offsets = rv.getOffsets();
-  int lastVarPosition  = rv.getLastVarPosition();
-  unordered_map<string,int> types = rv.getTypes();
+  // unordered_map<string,int> offsets = rv.getOffsets();
+  // int lastVarPosition  = rv.getLastVarPosition();
+  // unordered_map<string,int> types = rv.getTypes();
 
-  CodeGenVisitor v(offsets,types,lastVarPosition);
+  vector<FunctionData*> functionDatas = rv.getFunctionDatas();
+
+  // CodeGenVisitor v(offsets,types,lastVarPosition);
+  CodeGenVisitor v (functionDatas);
   v.visit(tree);
   // catch(const out_of_range& e ){
   //   cout <<"Error compiling"<<endl;
   //   cout <<e.what()<<endl;
   // }
+
+  for(auto & f:functionDatas){
+    delete f;
+  }
 
   return 0;
 }
