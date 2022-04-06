@@ -5,7 +5,6 @@ antlrcpp::Any ReadVarsVisitor::visitProg(ifccParser::ProgContext *ctx){
         FunctionData * fcData = new FunctionData();
         functionDatas.push_back(fcData);
 		visit(func);
-        
         currentIndex++;
 	}
     for(int i=0; i<functionDatas.size();i++){
@@ -23,7 +22,7 @@ antlrcpp::Any ReadVarsVisitor::visitProg(ifccParser::ProgContext *ctx){
         }
     }
 
-    // A corriger: mettre used et unused_vars dans functionData et itérer dessus pour chaque fonction
+    // A corriger: mettre used_vars dans functionData et itérer dessus pour chaque fonction
     for ( auto it : functionDatas[0]->getVars())
     {
         if(!(find(used_vars.begin(), used_vars.end(), it) != used_vars.end()))
@@ -50,9 +49,14 @@ antlrcpp::Any ReadVarsVisitor::visitFunc(ifccParser::FuncContext *ctx){
 
 antlrcpp::Any ReadVarsVisitor::visitDeclaration_intconst(ifccParser::Declaration_intconstContext *ctx) {
     FunctionData * currentF = functionDatas[currentIndex];
-
+    unordered_map<string,int> types = currentF->getTypes();
 
     string varName = ctx->ALPHANUMERIC()->getText();
+
+    if(types[varName]!=0){
+        throw invalid_argument("Redaclaration of variable: "+varName);
+    }
+
     currentF->addToVars(varName);
 
     int type=(ctx->TYPE()->getText()=="int")?4:1;
@@ -60,14 +64,18 @@ antlrcpp::Any ReadVarsVisitor::visitDeclaration_intconst(ifccParser::Declaration
 
     // cout<<"type: "<<functionDatas[currentIndex]->getTypes().at(varName)<<" vs: "<<types[varName]<<endl;
     currentF->decrementLastVarPosition(type);
-
     return 0;
 };
 
 antlrcpp::Any ReadVarsVisitor::visitDeclaration_charconst(ifccParser::Declaration_charconstContext *ctx) {
     FunctionData * currentF = functionDatas[currentIndex];
+   unordered_map<string,int> types = currentF->getTypes();
 
     string varName = ctx->ALPHANUMERIC()->getText();
+
+    if(types[varName]!=0){
+        throw invalid_argument("Redaclaration of variable: "+varName);
+    }
     currentF->addToVars(varName);
     int type=(ctx->TYPE()->getText()=="int")?4:1;
     currentF->addToTypes(varName,type); 
@@ -78,10 +86,16 @@ antlrcpp::Any ReadVarsVisitor::visitDeclaration_charconst(ifccParser::Declaratio
 
 antlrcpp::Any ReadVarsVisitor::visitDeclaration_variable(ifccParser::Declaration_variableContext *ctx) {
     FunctionData * currentF = functionDatas[currentIndex];
-    unordered_map<string, int> types = functionDatas[currentIndex]->getTypes();
+    unordered_map<string,int> types = currentF->getTypes();
 
     string leftVar = ctx->ALPHANUMERIC().at(0)->getText();
     string rightVar= ctx->ALPHANUMERIC().at(1)->getText();
+
+    if(types[leftVar]!=0){
+        throw invalid_argument("Redaclaration of variable: "+leftVar);
+    }
+
+   
     
     if(types[rightVar]==0){
         throw out_of_range("Undeclared variable: ("+rightVar+") at variable declaration of: ("+leftVar+")");
@@ -99,14 +113,82 @@ antlrcpp::Any ReadVarsVisitor::visitDeclaration_variable(ifccParser::Declaration
 antlrcpp::Any ReadVarsVisitor::visitDeclaration_expr(ifccParser::Declaration_exprContext *ctx) {
     FunctionData * currentF = functionDatas[currentIndex];
 
+    unordered_map<string,int> types = currentF->getTypes();
+
     string varName = ctx->ALPHANUMERIC()->getText();
+
+    if(types[varName]!=0){
+        throw invalid_argument("Redaclaration of variable: "+varName);
+    }
+
     currentF->addToVars(varName);
 
     int type=(ctx->TYPE()->getText()=="int")?4:1;
     currentF->addToTypes(varName,type); 
     currentF->decrementLastVarPosition(type);
+
     return 0;
 };
+
+
+antlrcpp::Any ReadVarsVisitor::visitAffectation_intconst(ifccParser::Affectation_intconstContext *ctx){
+    unordered_map<string, int> types = functionDatas[currentIndex]->getTypes();
+
+    string varName = ctx->ALPHANUMERIC()->getText();
+    if(types[varName]==0){
+        throw out_of_range("Undeclared variable: ("+varName+") at variable affectation");
+    }
+	return 0;
+}
+
+  antlrcpp::Any ReadVarsVisitor::visitAffectation_charconst(ifccParser::Affectation_charconstContext *ctx){
+    unordered_map<string, int> types = functionDatas[currentIndex]->getTypes();
+
+    string varName = ctx->ALPHANUMERIC()->getText();
+    if(types[varName]==0){
+        throw out_of_range("Undeclared variable: ("+varName+") at variable affectation");
+    }
+
+    
+    return 0;
+  }
+
+  antlrcpp::Any ReadVarsVisitor::visitAffectation_variable(ifccParser::Affectation_variableContext *ctx){
+    unordered_map<string, int> types = functionDatas[currentIndex]->getTypes();
+
+    string leftVar = ctx->ALPHANUMERIC().at(0)->getText();
+    string rightVar = ctx->ALPHANUMERIC().at(1)->getText();
+    if(types[leftVar]==0){
+        throw out_of_range("Undeclared variable: ("+leftVar+") at variable affectation");
+    }
+
+    if(types[rightVar]==0){
+        throw out_of_range("Undeclared variable: ("+rightVar+") at variable affectation of: ("+leftVar+")");
+    }
+	return 0;
+  }
+
+  antlrcpp::Any ReadVarsVisitor::visitAffectation_expr(ifccParser::Affectation_exprContext *ctx){
+    unordered_map<string, int> types = functionDatas[currentIndex]->getTypes();
+
+    string varName = ctx->ALPHANUMERIC()->getText();
+    if(types[varName]==0){
+        throw out_of_range("Undeclared variable: ("+varName+") at variable affectation");
+    }
+	return 0;
+  }
+
+  antlrcpp::Any ReadVarsVisitor::visitAffectation_function_call(ifccParser::Affectation_function_callContext *ctx){
+    unordered_map<string, int> types = functionDatas[currentIndex]->getTypes();
+
+    string varName = ctx->ALPHANUMERIC()->getText();
+    if(types[varName]==0){
+        throw out_of_range("Undeclared variable: ("+varName+") at variable affectation");
+    }
+	  return 0;
+  }
+
+
 
 antlrcpp::Any ReadVarsVisitor::visitReturn_variable(ifccParser::Return_variableContext *ctx) {
 
@@ -118,6 +200,7 @@ antlrcpp::Any ReadVarsVisitor::visitReturn_variable(ifccParser::Return_variableC
     }
 
     used_vars.push_back(varName);
+
 
     return 0;
     
@@ -139,7 +222,10 @@ antlrcpp::Any ReadVarsVisitor::visitDeclaration_function_call(ifccParser::Declar
 antlrcpp::Any ReadVarsVisitor::visitVariable(ifccParser::VariableContext *ctx){
     string varName = ctx->ALPHANUMERIC()->getText();
     used_vars.push_back(varName);
+    return 0;
 }
+
+
 
 // unordered_map <string,int> ReadVarsVisitor::getOffsets(){
 //     return offsets;

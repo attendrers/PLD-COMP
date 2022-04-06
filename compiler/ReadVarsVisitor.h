@@ -38,8 +38,25 @@ public:
     virtual antlrcpp::Any visitReturn_variable(ifccParser::Return_variableContext *ctx) override;
 
     virtual antlrcpp::Any visitDeclaration_function_call(ifccParser::Declaration_function_callContext *ctx) override;
+
+    // Affectations
+
+    virtual antlrcpp::Any visitAffectation_intconst(ifccParser::Affectation_intconstContext *ctx) override;
+
+    virtual antlrcpp::Any visitAffectation_charconst(ifccParser::Affectation_charconstContext *ctx) override;
+
+    virtual antlrcpp::Any visitAffectation_variable(ifccParser::Affectation_variableContext *ctx) override;
+
+    virtual antlrcpp::Any visitAffectation_expr(ifccParser::Affectation_exprContext *ctx) override;
+
+    virtual antlrcpp::Any visitAffectation_function_call(ifccParser::Affectation_function_callContext *ctx) override;
+
     
     virtual antlrcpp::Any visitVariable(ifccParser::VariableContext *ctx) override;
+
+    virtual antlrcpp::Any visitReturn_expr(ifccParser::Return_exprContext *ctx) override {
+        return 0;
+    }
 
     vector<FunctionData*> getFunctionDatas(){
         return functionDatas;

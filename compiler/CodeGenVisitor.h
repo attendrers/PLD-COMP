@@ -37,10 +37,20 @@ class CodeGenVisitor : public ifccBaseVisitor
 
         virtual antlrcpp::Any visitDeclaration_expr(ifccParser::Declaration_exprContext *ctx) override ;
 
+        // Affectations
+
+        virtual antlrcpp::Any visitAffectation_intconst(ifccParser::Affectation_intconstContext *ctx) override;
+
+        virtual antlrcpp::Any visitAffectation_charconst(ifccParser::Affectation_charconstContext *ctx) override;
+
+        virtual antlrcpp::Any visitAffectation_variable(ifccParser::Affectation_variableContext *ctx) override;
+
+        virtual antlrcpp::Any visitAffectation_expr(ifccParser::Affectation_exprContext *ctx) override;
+
+        virtual antlrcpp::Any visitAffectation_function_call(ifccParser::Affectation_function_callContext *ctx) override;
+
 
         // Return
-        virtual antlrcpp::Any visitReturn(ifccParser::ReturnContext *ctx) override ;
-
         virtual antlrcpp::Any visitReturn_intconst(ifccParser::Return_intconstContext *ctx) override ;
         
         virtual antlrcpp::Any visitReturn_charconst(ifccParser::Return_charconstContext *ctx) override ;
@@ -80,8 +90,6 @@ class CodeGenVisitor : public ifccBaseVisitor
         // functions
 
         virtual antlrcpp::Any visitFunction_call(ifccParser::Function_callContext *ctx) override;
-
-        virtual antlrcpp::Any visitLine_function_call(ifccParser::Line_function_callContext *ctx) override;
 
         virtual antlrcpp::Any visitDeclaration_function_call(ifccParser::Declaration_function_callContext *ctx) override;
 

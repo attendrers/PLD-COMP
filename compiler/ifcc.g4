@@ -9,15 +9,24 @@ func: (TYPE|'void') funcName=ALPHANUMERIC '(' ')' '{' line* '}';
 
 bloc : '{' line* '}';
 
-line
-    : TYPE ALPHANUMERIC '=' INT_CONST ';'             # declaration_intconst
-    | TYPE ALPHANUMERIC '=' CHAR_CONST ';'            # declaration_charconst
-    | TYPE ALPHANUMERIC '=' ALPHANUMERIC ';'          # declaration_variable
-    | TYPE ALPHANUMERIC '=' expr ';'                  # declaration_expr
-    | TYPE ALPHANUMERIC '=' func_call ';'             # declaration_function_call
+line:
+    decl                                              # declaration
+    | affect                                          # affectation
     | func_call ';'                                   # line_function_call
     | ifstatement                                     # statement_if
     | return_global                                   # return ;
+
+decl: TYPE ALPHANUMERIC '=' INT_CONST ';'             # declaration_intconst
+    | TYPE ALPHANUMERIC '=' CHAR_CONST ';'            # declaration_charconst
+    | TYPE ALPHANUMERIC '=' ALPHANUMERIC ';'          # declaration_variable
+    | TYPE ALPHANUMERIC '=' expr ';'                  # declaration_expr
+    | TYPE ALPHANUMERIC '=' func_call ';'             # declaration_function_call ;
+
+affect: ALPHANUMERIC '=' INT_CONST ';'                # affectation_intconst
+    | ALPHANUMERIC '=' CHAR_CONST ';'                 # affectation_charconst
+    | ALPHANUMERIC '=' ALPHANUMERIC ';'               # affectation_variable
+    | ALPHANUMERIC '=' expr ';'                       # affectation_expr
+    | ALPHANUMERIC '=' func_call ';'                  # affectation_function_call ;
 
 func_call: 
 funcName=ALPHANUMERIC '(' (primaryexpr ','?)* ')'     # function_call ; 

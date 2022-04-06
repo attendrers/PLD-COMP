@@ -4,9 +4,9 @@ int main(){
     if (a == 1) {
         b = 1;
     } else if (a==2){
-        b = -a
+        b = -a;
     } else {
         b = 0;
     }
-    return b
+    return b;
 }
