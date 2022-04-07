@@ -56,7 +56,8 @@ antlrcpp::Any CodeGenVisitor::visitBloc(ifccParser::BlocContext *ctx)
 antlrcpp::Any CodeGenVisitor::visitDeclaration_intconst(ifccParser::Declaration_intconstContext *ctx){
 	// Case int a = 5 ; 
 	string varName = ctx->ALPHANUMERIC()->getText();
-	int varValue = stoi(ctx->INT_CONST()->getText());
+	int varValue=0;
+	if(ctx->INT_CONST()) varValue = stoi(ctx->INT_CONST()->getText());
 
 	unordered_map<string, int> offsets = functionDatas[currentIndex]->getOffsets();
 	cout<<"	movl	$"<<varValue<<", "<<offsets[varName]<<"(%rbp)\n";

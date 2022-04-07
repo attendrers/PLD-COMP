@@ -18,7 +18,7 @@ line:
     | return_global                                   # return 
     ;
 
-decl: TYPE ALPHANUMERIC '=' INT_CONST ';'             # declaration_intconst
+decl: TYPE ALPHANUMERIC ('=' INT_CONST)? ';'          # declaration_intconst
     | TYPE ALPHANUMERIC '=' CHAR_CONST ';'            # declaration_charconst
     | TYPE ALPHANUMERIC '=' ALPHANUMERIC ';'          # declaration_variable
     | TYPE ALPHANUMERIC '=' expr ';'                  # declaration_expr
