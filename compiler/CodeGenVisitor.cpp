@@ -34,6 +34,11 @@ antlrcpp::Any CodeGenVisitor::visitFunc(ifccParser::FuncContext *ctx){
 	
 	for(auto & line : ctx->line()){
 		visit(line);
+		if(fin==true)
+		{
+			fin=false;
+			break;
+		}
 	}
 
 	 cout<<
@@ -47,6 +52,11 @@ antlrcpp::Any CodeGenVisitor::visitBloc(ifccParser::BlocContext *ctx)
 {
 	for(auto & line : ctx->line()){
 		visit(line);
+		if(fin==true)
+		{
+			fin=false;
+			break;
+		}
 	}
 	return 0;
 }
@@ -282,6 +292,7 @@ antlrcpp::Any CodeGenVisitor::visitReturn_intconst(ifccParser::Return_intconstCo
     // Case return constant ( return 10; )
     int retval = stoi(ctx->INT_CONST()->getText());
     cout<<" 	movl	$"<<retval<<", %eax\n";
+	fin=true;
     return 0;
 }
 
@@ -290,6 +301,7 @@ antlrcpp::Any CodeGenVisitor::visitReturn_charconst(ifccParser::Return_charconst
     string temp = ctx->CHAR_CONST()->getText();
 	int retval = (int)temp.at(1);
     cout<<" 	movl	$"<<retval<<", %eax\n";
+	fin=true;
     return 0;
 }
 
@@ -300,13 +312,14 @@ antlrcpp::Any CodeGenVisitor::visitReturn_variable(ifccParser::Return_variableCo
 	unordered_map<string, int> types = functionDatas[currentIndex]->getTypes();
 	string op = types[varName] == 4 ? "	movl	" : "	movsbl	";
     cout<<op<<offsets[varName]<<"(%rbp), %eax\n";
+	fin=true;
     return 0;
 }
 
 antlrcpp::Any CodeGenVisitor::visitReturn_expr(ifccParser::Return_exprContext *ctx) {
     string place = visit(ctx->expr());
 	cout <<"	movl	"<<place<<", %eax\n";
-
+	fin=true;
     return 0;
 }
 
