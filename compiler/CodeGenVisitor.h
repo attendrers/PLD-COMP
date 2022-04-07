@@ -97,6 +97,8 @@ class CodeGenVisitor : public ifccBaseVisitor
 
         virtual antlrcpp::Any visitOp_bit(ifccParser::Op_bitContext *ctx) override ;
 
+        virtual antlrcpp::Any visitExpr_func_call(ifccParser::Expr_func_callContext *ctx) override ;
+
         // primaryexpr
         virtual antlrcpp::Any visitChar(ifccParser::CharContext *ctx) override ;
 

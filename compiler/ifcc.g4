@@ -79,6 +79,7 @@ expr
     | primaryexpr                                          # prExpr
     | '!' expr                                             # op_not
     | '-' expr                                             # op_opposite
+    | func_call                                            # expr_func_call
     | left=expr op=('*'|'/') right=expr                    # op_muldiv
     | left=expr op=('+'|'-') right=expr                    # op_plusmoins
     | left=expr op=('<'|'>'|'<='|'>=') right=expr          # op_infsup

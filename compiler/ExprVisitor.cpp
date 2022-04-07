@@ -161,3 +161,11 @@ antlrcpp::Any CodeGenVisitor::visitInt(ifccParser::IntContext *ctx){
     string place = allocateTmpVar(4,functionDatas[currentIndex],string("$"+to_string(val)));
     return place;
 };
+
+antlrcpp::Any CodeGenVisitor::visitExpr_func_call(ifccParser::Expr_func_callContext *ctx){
+    visit(ctx->func_call());
+
+    // Result from function call is in %eax we move in a new temporary variable in a register
+	string place = allocateTmpVar(4,functionDatas[currentIndex],"%eax");
+    return place;
+}
