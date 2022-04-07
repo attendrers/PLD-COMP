@@ -45,7 +45,7 @@ antlrcpp::Any CodeGenVisitor::visitFunc(ifccParser::FuncContext *ctx){
 
 antlrcpp::Any CodeGenVisitor::visitBloc(ifccParser::BlocContext *ctx)
 {
-	std::cout<<".L"<<blocIndex<<":\n";
+	cout<<".L"<<blocIndex<<":\n";
 	for(auto & line : ctx->line()){
 		visit(line);
 	}
@@ -101,21 +101,34 @@ antlrcpp::Any CodeGenVisitor::visitDeclaration_expr(ifccParser::Declaration_expr
 // Affectations
 
 antlrcpp::Any CodeGenVisitor::visitAffectation_intconst(ifccParser::Affectation_intconstContext *ctx){
-	// TODO
+	string varName = ctx->ALPHANUMERIC()->getText();
+	int varValue = stoi(ctx->INT_CONST()->getText());
+
+	unordered_map<string, int> offsets = functionDatas[currentIndex]->getOffsets();
+	cout<<"	movl	$"<<varValue<<", "<<offsets[varName]<<"(%rbp)\n";
 	return 0;
 }
 
-  antlrcpp::Any CodeGenVisitor::visitAffectation_charconst(ifccParser::Affectation_charconstContext *ctx){
-	  // TODO
-	  return 0;
-  }
+antlrcpp::Any CodeGenVisitor::visitAffectation_charconst(ifccParser::Affectation_charconstContext *ctx){
+	string varName = ctx->ALPHANUMERIC()->getText();
+	string temp = ctx->CHAR_CONST()->getText();
+	int varValue = (int)temp.at(1);
 
-  antlrcpp::Any CodeGenVisitor::visitAffectation_variable(ifccParser::Affectation_variableContext *ctx){
-	  // TODO
-	  return 0;
-  }
+	unordered_map<string, int> offsets = functionDatas[currentIndex]->getOffsets();
+	cout<<"	movb	$"<<varValue<<", "<<offsets[varName]<<"(%rbp)\n";
+	return 0;
+}
 
-  antlrcpp::Any CodeGenVisitor::visitAffectation_expr(ifccParser::Affectation_exprContext *ctx){
+antlrcpp::Any CodeGenVisitor::visitAffectation_variable(ifccParser::Affectation_variableContext *ctx){
+	string leftVar = ctx->ALPHANUMERIC().at(0)->getText(); 
+	string rightVar= ctx->ALPHANUMERIC().at(1)->getText();
+	unordered_map<string, int> offsets = functionDatas[currentIndex]->getOffsets();
+	cout <<"	movl	"<<offsets[rightVar]<<"(%rbp), %eax"<<"\n";
+	cout<<"	movl	%eax, "<<offsets[leftVar]<<"(%rbp)\n";
+	return 0;
+}
+
+antlrcpp::Any CodeGenVisitor::visitAffectation_expr(ifccParser::Affectation_exprContext *ctx){
 
 	unordered_map<string, int> offsets = functionDatas[currentIndex]->getOffsets();
 	
@@ -126,12 +139,12 @@ antlrcpp::Any CodeGenVisitor::visitAffectation_intconst(ifccParser::Affectation_
 	cout<<" 	movl	"<<place<<", %eax\n";
 	cout<<" 	movl	%eax, "<<offsets[varName]<<"(%rbp)\n";
 	return 0;
-  }
+}
 
-  antlrcpp::Any CodeGenVisitor::visitAffectation_function_call(ifccParser::Affectation_function_callContext *ctx){
+antlrcpp::Any CodeGenVisitor::visitAffectation_function_call(ifccParser::Affectation_function_callContext *ctx){
 	  // TODO
 	  return 0;
-  }
+}
 
 // Conditions
 antlrcpp::Any CodeGenVisitor::visitComp_infsup(ifccParser::Comp_infsupContext *ctx){
@@ -158,7 +171,7 @@ antlrcpp::Any CodeGenVisitor::visitComp_infsup(ifccParser::Comp_infsupContext *c
     {
         cout<<"\tjge     ";
     }
-    
+	cout<<".L"<<blocIndex<<"\n";
     return 0;
 }
 
@@ -178,6 +191,7 @@ antlrcpp::Any CodeGenVisitor::visitComp_equalornot(ifccParser::Comp_equalornotCo
     {
         cout<<"\tje      ";
     }
+	cout<<".L"<<blocIndex<<"\n";
     return 0;
 }
 
@@ -185,9 +199,8 @@ antlrcpp::Any CodeGenVisitor::visitComp_equalornot(ifccParser::Comp_equalornotCo
 
 antlrcpp::Any CodeGenVisitor::visitStatement_if(ifccParser::Statement_ifContext *ctx)
 {
-	visit(ctx->cond);
 	blocIndex++;
-	cout<<".L"<<blocIndex<<"\n";
+	visit(ctx->cond);
 	visit(ctx->blocif);
 	if(ctx->ELSE())
 	{
@@ -249,6 +262,3 @@ antlrcpp::Any CodeGenVisitor::visitDeclaration_function_call(ifccParser::Declara
 	cout<<"	movl	%eax, "<<offsets[varName]<<"(%rbp)\n";
 	return 0;
 }
-
-
-
