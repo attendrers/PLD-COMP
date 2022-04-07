@@ -45,7 +45,6 @@ antlrcpp::Any CodeGenVisitor::visitFunc(ifccParser::FuncContext *ctx){
 
 antlrcpp::Any CodeGenVisitor::visitBloc(ifccParser::BlocContext *ctx)
 {
-	cout<<".L"<<blocIndex<<":\n";
 	for(auto & line : ctx->line()){
 		visit(line);
 	}
@@ -206,8 +205,15 @@ antlrcpp::Any CodeGenVisitor::visitStatement_if(ifccParser::Statement_ifContext 
 	{
 		blocIndex++;
 		cout<<"\tjmp    .L"<<blocIndex<<"\n";
+		cout<<".L"<<blocIndex-1<<":\n";
 		visit(ctx->blocelse);
+		cout<<".L"<<blocIndex<<":\n";
 	}
+	else
+	{
+		cout<<".L"<<blocIndex<<":\n";
+	}
+	return 0;
 }
 
 // Returns

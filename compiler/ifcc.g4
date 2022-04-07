@@ -47,7 +47,8 @@ condition
     ;
 
 ifstatement
-    : IF '(' cond=condition ')' blocif=bloc (ELSE blocelse=bloc)? ;  # statement_if
+    : IF '(' cond=condition ')' blocif=bloc (ELSE blocelse=bloc)?   # statement_if
+    ;
 
 primaryexpr
     : INT_CONST                                            #int
