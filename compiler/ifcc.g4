@@ -13,7 +13,7 @@ line:
     decl                                              # declaration
     | affect                                          # affectation
     | func_call ';'                                   # line_function_call
-    | ifstatement                                     # statement_if
+    | ifstatement                                     # caseif
     | return_global                                   # return ;
 
 decl: TYPE ALPHANUMERIC '=' INT_CONST ';'             # declaration_intconst
@@ -44,12 +44,7 @@ condition
     ;
 
 ifstatement
-    : 'if' '(' condition ')' bloc elsebloc;
-
-elsebloc
-    : 'else' bloc                                          #ifelse
-    |                                                      #noelse
-    ;
+    : IF '(' cond=condition ')' blocif=bloc (ELSE blocelse=bloc)? ;  # statement_if
 
 primaryexpr
     : INT_CONST                                            #int
@@ -69,6 +64,8 @@ expr
     | left=expr op=('&'|'^'|'|') right=expr                # op_bit
     ;
 
+IF : 'if';
+ELSE : 'else';
 RETURN : 'return' ;
 INT_CONST : [-]?[0-9]+ ;
 CHAR_CONST : '\'' . '\'';
