@@ -43,6 +43,15 @@ antlrcpp::Any CodeGenVisitor::visitFunc(ifccParser::FuncContext *ctx){
 	return 0;
 }
 
+antlrcpp::Any CodeGenVisitor::visitBloc(ifccParser::BlocContext *ctx)
+{
+	std::cout<<".L"<<blocIndex<<":\n";
+	for(auto & line : ctx->line()){
+		visit(line);
+	}
+	return 0;
+}
+
 // Declarations
 
 antlrcpp::Any CodeGenVisitor::visitDeclaration_intconst(ifccParser::Declaration_intconstContext *ctx){
@@ -123,6 +132,70 @@ antlrcpp::Any CodeGenVisitor::visitAffectation_intconst(ifccParser::Affectation_
 	  // TODO
 	  return 0;
   }
+
+// Conditions
+antlrcpp::Any CodeGenVisitor::visitComp_infsup(ifccParser::Comp_infsupContext *ctx){
+    // Get places of stored left/right vars
+    string tmp0 = visit(ctx->left);
+    string tmp1 = visit(ctx->right);
+    string  op = ctx->op->getText();
+    cout<<"\tmovl    " + tmp0 + ", %eax\n";
+    cout<<"\tcmpl    " + tmp1 + ", %eax\n";
+    //comparaison in a expression
+    if(op==">=")
+    {
+        cout<<"\tjl      ";
+    }
+    else if(op=="<=")
+    {
+        cout<<"\tjg      ";
+    }
+    else if(op==">")
+    {
+        cout<<"\tjle     ";
+    }
+    else if(op=="<")
+    {
+        cout<<"\tjge     ";
+    }
+    
+    return 0;
+}
+
+antlrcpp::Any CodeGenVisitor::visitComp_equalornot(ifccParser::Comp_equalornotContext *ctx){
+    // Get places of stored left/right vars
+    string tmp0 = visit(ctx->left);
+    string tmp1 = visit(ctx->right);
+    string  op = ctx->op->getText();
+    cout<<"\tmovl    " + tmp0 + ", %eax\n";
+    cout<<"\tcmpl    " + tmp1 + ", %eax\n";
+    //comparaison in a expression
+    if(op=="==")
+    {
+        cout<<"\tjne     ";
+    }
+    else if(op=="!=")
+    {
+        cout<<"\tje      ";
+    }
+    return 0;
+}
+
+// Statements
+
+antlrcpp::Any CodeGenVisitor::visitStatement_if(ifccParser::Statement_ifContext *ctx)
+{
+	visit(ctx->cond);
+	blocIndex++;
+	cout<<".L"<<blocIndex<<"\n";
+	visit(ctx->blocif);
+	if(ctx->ELSE())
+	{
+		blocIndex++;
+		cout<<"\tjmp    .L"<<blocIndex<<"\n";
+		visit(ctx->blocelse);
+	}
+}
 
 // Returns
 
