@@ -5,7 +5,7 @@ axiom : prog ;
 
 prog : (func*);
 
-func: (TYPE|'void') funcName=ALPHANUMERIC '(' ')' '{' line* '}';
+func: (TYPE|'void') funcName=ALPHANUMERIC '(' (TYPE ALPHANUMERIC','?)* ')' '{' line* '}';
 
 bloc : '{' line* '}';
 
@@ -33,7 +33,7 @@ affect: ALPHANUMERIC '=' INT_CONST ';'                # affectation_intconst
     ;
 
 func_call: 
-funcName=ALPHANUMERIC '(' (primaryexpr ','?)* ')'     # function_call ; 
+funcName=ALPHANUMERIC '(' (func_param ','?)* ')'     # function_call ; 
 
 return_global
     : RETURN INT_CONST ';'                                  # return_intconst
@@ -59,6 +59,14 @@ condition2
 whilestatement
     : WHILE '(' cond=condition2 ')' bloc                    # statement_while
     ;
+
+
+func_param
+    : INT_CONST                                            #f_int
+    | CHAR_CONST                                           #f_char
+    | ALPHANUMERIC                                         #f_variable
+    ;
+
 
 primaryexpr
     : INT_CONST                                            #int
