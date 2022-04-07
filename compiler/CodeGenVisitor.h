@@ -57,9 +57,14 @@ class CodeGenVisitor : public ifccBaseVisitor
 
         virtual antlrcpp::Any visitComp_equalornot(ifccParser::Comp_equalornotContext *ctx) override ;
 
+        virtual antlrcpp::Any visitComp2_infsup(ifccParser::Comp2_infsupContext *ctx) override ;
+
+        virtual antlrcpp::Any visitComp2_equalornot(ifccParser::Comp2_equalornotContext *ctx) override ;
+
         // Statements
         virtual antlrcpp::Any visitStatement_if(ifccParser::Statement_ifContext *ctx) override ;
 
+        virtual antlrcpp::Any visitStatement_while(ifccParser::Statement_whileContext *ctx) override ;
 
         // Return
         virtual antlrcpp::Any visitReturn_intconst(ifccParser::Return_intconstContext *ctx) override ;

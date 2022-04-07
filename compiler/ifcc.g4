@@ -14,6 +14,7 @@ line:
     | affect                                          # affectation
     | func_call ';'                                   # line_function_call
     | ifstatement                                     # caseif
+    | whilestatement                                  # casewhile
     | return_global                                   # return 
     ;
 
@@ -50,6 +51,15 @@ ifstatement
     : IF '(' cond=condition ')' blocif=bloc (ELSE blocelse=bloc)?   # statement_if
     ;
 
+condition2
+    : left=expr op=('<'|'>'|'<='|'>=') right=expr           # comp2_infsup
+    | left=expr op=('=='|'!=') right=expr                   # comp2_equalornot
+    ;
+
+whilestatement
+    : WHILE '(' cond=condition2 ')' bloc                    # statement_while
+    ;
+
 primaryexpr
     : INT_CONST                                            #int
     | CHAR_CONST                                           #char
@@ -70,6 +80,7 @@ expr
 
 IF : 'if';
 ELSE : 'else';
+WHILE : 'while' ;
 RETURN : 'return' ;
 INT_CONST : [-]?[0-9]+ ;
 CHAR_CONST : '\'' . '\'';

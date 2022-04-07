@@ -194,6 +194,54 @@ antlrcpp::Any CodeGenVisitor::visitComp_equalornot(ifccParser::Comp_equalornotCo
     return 0;
 }
 
+antlrcpp::Any CodeGenVisitor::visitComp2_infsup(ifccParser::Comp2_infsupContext *ctx){
+    // Get places of stored left/right vars
+    string tmp0 = visit(ctx->left);
+    string tmp1 = visit(ctx->right);
+    string  op = ctx->op->getText();
+    cout<<"\tmovl    " + tmp0 + ", %eax\n";
+    cout<<"\tcmpl    " + tmp1 + ", %eax\n";
+    //comparaison in a expression
+    if(op==">=")
+    {
+        cout<<"\tjge     ";
+    }
+    else if(op=="<=")
+    {
+        cout<<"\tjle     ";
+    }
+    else if(op==">")
+    {
+        cout<<"\tjg      ";
+    }
+    else if(op=="<")
+    {
+        cout<<"\tjl      ";
+    }
+	cout<<".L"<<blocIndex<<"\n";
+    return 0;
+}
+
+antlrcpp::Any CodeGenVisitor::visitComp2_equalornot(ifccParser::Comp2_equalornotContext *ctx){
+    // Get places of stored left/right vars
+    string tmp0 = visit(ctx->left);
+    string tmp1 = visit(ctx->right);
+    string  op = ctx->op->getText();
+    cout<<"\tmovl    " + tmp0 + ", %eax\n";
+    cout<<"\tcmpl    " + tmp1 + ", %eax\n";
+    //comparaison in a expression
+    if(op=="==")
+    {
+        cout<<"\tje      ";
+    }
+    else if(op=="!=")
+    {
+        cout<<"\tjne     ";
+    }
+	cout<<".L"<<blocIndex<<"\n";
+    return 0;
+}
+
 // Statements
 
 antlrcpp::Any CodeGenVisitor::visitStatement_if(ifccParser::Statement_ifContext *ctx)
@@ -213,6 +261,17 @@ antlrcpp::Any CodeGenVisitor::visitStatement_if(ifccParser::Statement_ifContext 
 	{
 		cout<<".L"<<blocIndex<<":\n";
 	}
+	return 0;
+}
+
+antlrcpp::Any CodeGenVisitor::visitStatement_while(ifccParser::Statement_whileContext *ctx)
+{
+	blocIndex+=2;
+	cout<<"\tjmp .L"<<blocIndex<<"\n";
+	cout<<".L"<<blocIndex<<":\n";
+	visit(ctx->bloc());
+	cout<<".L"<<blocIndex-1<<":\n";
+	visit(ctx->cond);
 	return 0;
 }
 
