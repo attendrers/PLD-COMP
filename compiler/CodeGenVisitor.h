@@ -29,6 +29,8 @@ class CodeGenVisitor : public ifccBaseVisitor
 
         virtual antlrcpp::Any visitFunc(ifccParser::FuncContext *ctx) override;
 
+        virtual antlrcpp::Any visitBloc(ifccParser::BlocContext *ctx) override;
+
         // Declarations
         virtual antlrcpp::Any visitDeclaration_intconst(ifccParser::Declaration_intconstContext *ctx) override ;
         
