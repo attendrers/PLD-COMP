@@ -17,12 +17,13 @@ class CodeGenVisitor : public ifccBaseVisitor
         // int lastVarPosition;
         vector<FunctionData*> functionDatas;
         int currentIndex;
+        int blocIndex;
 
 
     public:
         // CodeGenVisitor(unordered_map <string,int> & offsets, unordered_map <string,int> types, int lastVarPosition): ifccBaseVisitor(),offsets(offsets),types(types),i(0),lastVarPosition(lastVarPosition){};
 
-        CodeGenVisitor(vector<FunctionData*> functionDatas): ifccBaseVisitor(),functionDatas(functionDatas),currentIndex(0){}; 
+        CodeGenVisitor(vector<FunctionData*> functionDatas): ifccBaseVisitor(),functionDatas(functionDatas),currentIndex(0),blocIndex(0){}; 
 
         virtual antlrcpp::Any visitProg(ifccParser::ProgContext *ctx) override;
 
@@ -48,6 +49,14 @@ class CodeGenVisitor : public ifccBaseVisitor
         virtual antlrcpp::Any visitAffectation_expr(ifccParser::Affectation_exprContext *ctx) override;
 
         virtual antlrcpp::Any visitAffectation_function_call(ifccParser::Affectation_function_callContext *ctx) override;
+
+        // Conditions
+        virtual antlrcpp::Any visitComp_infsup(ifccParser::Comp_infsupContext *ctx) override ;
+
+        virtual antlrcpp::Any visitComp_equalornot(ifccParser::Comp_equalornotContext *ctx) override ;
+
+        // Statements
+        virtual antlrcpp::Any visitStatement_if(ifccParser::Statement_ifContext *ctx) override ;
 
 
         // Return
