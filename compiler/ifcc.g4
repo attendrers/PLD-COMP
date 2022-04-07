@@ -14,19 +14,22 @@ line:
     | affect                                          # affectation
     | func_call ';'                                   # line_function_call
     | ifstatement                                     # caseif
-    | return_global                                   # return ;
+    | return_global                                   # return 
+    ;
 
 decl: TYPE ALPHANUMERIC '=' INT_CONST ';'             # declaration_intconst
     | TYPE ALPHANUMERIC '=' CHAR_CONST ';'            # declaration_charconst
     | TYPE ALPHANUMERIC '=' ALPHANUMERIC ';'          # declaration_variable
     | TYPE ALPHANUMERIC '=' expr ';'                  # declaration_expr
-    | TYPE ALPHANUMERIC '=' func_call ';'             # declaration_function_call ;
+    | TYPE ALPHANUMERIC '=' func_call ';'             # declaration_function_call 
+    ;
 
 affect: ALPHANUMERIC '=' INT_CONST ';'                # affectation_intconst
     | ALPHANUMERIC '=' CHAR_CONST ';'                 # affectation_charconst
     | ALPHANUMERIC '=' ALPHANUMERIC ';'               # affectation_variable
     | ALPHANUMERIC '=' expr ';'                       # affectation_expr
-    | ALPHANUMERIC '=' func_call ';'                  # affectation_function_call ;
+    | ALPHANUMERIC '=' func_call ';'                  # affectation_function_call 
+    ;
 
 func_call: 
 funcName=ALPHANUMERIC '(' (primaryexpr ','?)* ')'     # function_call ; 
@@ -75,9 +78,3 @@ INLINECOMMENT : '//' ~[\r\n]* [\r\n] -> skip ;
 DIRECTIVE : '#' .*? '\n' -> skip ;
 WS    : [ \t\r\n] -> channel(HIDDEN);
 ALPHANUMERIC: [_a-zA-Z] [_a-zA-Z0-9]*;
-
-
-
-
-
-
