@@ -1,4 +1,4 @@
 int main(){
-    //int toto ??{} +=3;
+    int toto = a;
     return toto;
 }
