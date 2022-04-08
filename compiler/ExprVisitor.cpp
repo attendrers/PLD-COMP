@@ -9,7 +9,8 @@ string allocateTmpVar(int type,FunctionData * f,string leftVar){
     f->decrementLastVarPosition(type);
     int lastVarPosition = f->getLastVarPosition();
     string place = string(to_string(lastVarPosition)+"(%rbp)");
-    cout<<"\tmovl    "<<leftVar<<", "<<lastVarPosition<<"(%rbp)\n";
+    string op = type == 4 ? "movl" : "movb";
+    cout<<"\t"<<op<<"   "<<leftVar<<", "<<lastVarPosition<<"(%rbp)\n";
     return place;
 }
 
@@ -143,6 +144,9 @@ antlrcpp::Any CodeGenVisitor::visitOp_bit(ifccParser::Op_bitContext *ctx){
 
 // primaryexpr
 antlrcpp::Any CodeGenVisitor::visitChar(ifccParser::CharContext *ctx){
+    string temp = ctx->CHAR_CONST()->getText();
+	int val = (int)temp.at(1);
+    string place = allocateTmpVar(1,functionDatas[currentIndex],string("$"+to_string(val)));
     return 0;
 };
 
@@ -158,163 +162,10 @@ antlrcpp::Any CodeGenVisitor::visitInt(ifccParser::IntContext *ctx){
     return place;
 };
 
+antlrcpp::Any CodeGenVisitor::visitExpr_func_call(ifccParser::Expr_func_callContext *ctx){
+    visit(ctx->func_call());
 
-// antlrcpp::Any CodeGenVisitor::visitMinus(ifccParser::MinusContext *context)
-// {
-//     string tmp0 = (string)visit(context->expr(0));
-//     string tmp1 = (string)visit(context->expr(1));
-//     assemblerText += "        movl    " + tmp0 + ", %edx\n";
-//     assemblerText += "        movl    " + tmp1 + ", %eax\n";
-//     assemblerText += "        subl	%edx, %eax\n";
-//     // i++;
-//     // return string("#tmp"+to_string(i));
-//     return string("%eax");
-// };
-
-// antlrcpp::Any CodeGenVisitor::visitMuldiv(ifccParser::MuldivContext *context)
-// {
-//     string tmp0 = (string)visit(context->expr(0));
-//     string tmp1 = (string)visit(context->expr(1));
-//     char op = context->OP()->getText()[0];
-//     if (op == '*')
-//     {
-//         assemblerText += "        movl    " + tmp0 + ", %edx\n";
-//         assemblerText += "        movl    " + tmp1 + ", %eax\n";
-//         assemblerText += "        imul	%edx, %eax\n";
-//     }
-//     else
-//     {
-//         assemblerText += "        movl    " + tmp0 + ", %eax\n";
-//         assemblerText += "        cltd\n";
-//         // %edx is used by the cltd command so we're gonna use %ebx instead it's a 32bits register just like %eax and %edx
-//         assemblerText += "        movl    " + tmp1 + ", %ebx\n";
-//         assemblerText += "        idivl	%ebx \n";
-//     }
-//     // i++;
-//     // return string("#tmp"+to_string(i));
-//     return string("%eax");
-// }
-
-// antlrcpp::Any CodeGenVisitor::visitCONST(ifccParser::CONSTContext *context)
-// {
-//     // i++;
-//     // return string("#tmp"+to_string(i));
-//     return string("$" + context->CONST()->getText());
-// }
-
-// antlrcpp::Any CodeGenVisitor::visitPlus(ifccParser::PlusContext *context)
-// {
-//     string tmp0 = (string)visit(context->expr(0));
-//     string tmp1 = (string)visit(context->expr(1));
-//     assemblerText += "        movl    " + tmp0 + ", %edx\n";
-//     assemblerText += "        movl    " + tmp1 + ", %eax\n";
-//     assemblerText += "        addl	%edx, %eax\n";
-//     // i++;
-//     // return string("#tmp"+to_string(i));
-//     return string("%eax");
-// }
-// antlrcpp::Any CodeGenVisitor::visitOp_or(ifccParser::Op_orContext *context) override
-// {
-//     string tmp0 = (string)visit(context->expr(0));
-//     string tmp1 = (string)visit(context->expr(1));
-//     assemblerText += "        movl    " + tmp0 + ", %edx\n";
-//     assemblerText += "        movl    " + tmp1 + ", %eax\n";
-//     assemblerText += "        orl	%edx, %eax\n";
-//     // i++;
-//     // return string("#tmp"+to_string(i));
-//     return string("%eax");
-// }
-
-// antlrcpp::Any CodeGenVisitor::visitOp_and(ifccParser::Op_andContext *context) override
-// {
-//     string tmp0 = (string)visit(context->expr(0));
-//     string tmp1 = (string)visit(context->expr(1));
-//     assemblerText += "        movl    " + tmp0 + ", %edx\n";
-//     assemblerText += "        movl    " + tmp1 + ", %eax\n";
-//     assemblerText += "        andl	%edx, %eax\n";
-//     // i++;
-//     // return string("#tmp"+to_string(i));
-//     return string("%eax");
-// }
-
-// antlrcpp::Any CodeGenVisitor::visitOp_xor(ifccParser::Op_xorContext *context) override
-// {
-//     string tmp0 = (string)visit(context->expr(0));
-//     string tmp1 = (string)visit(context->expr(1));
-//     assemblerText += "        movl    " + tmp0 + ", %edx\n";
-//     assemblerText += "        movl    " + tmp1 + ", %eax\n";
-//     assemblerText += "        xorl	%edx, %eax\n";
-//     // i++;
-//     // return string("#tmp"+to_string(i));
-//     return string("%eax");
-// }
-
-// antlrcpp::Any CodeGenVisitor::visitOp_equal(ifccParser::Op_equalContext *context) override
-// {
-//     string tmp0 = (string)visit(context->expr(0));
-//     string tmp1 = (string)visit(context->expr(1));
-//     assemblerText += "        movl    " + tmp0 + ", %edx\n";
-//     assemblerText += "        movl    " + tmp1 + ", %eax\n";
-//     assemblerText += "        cmpl	%edx, %eax\n";
-//     assemblerText += "        sete	%al\n";
-//     assemblerText += "        movzbl	%al, %eax\n";
-//     return string("%eax");
-// }
-
-// antlrcpp::Any CodeGenVisitor::visitOp_not_equal(ifccParser::Op_not_equalContext *context) override
-// {
-//     string tmp0 = (string)visit(context->expr(0));
-//     string tmp1 = (string)visit(context->expr(1));
-//     assemblerText += "        movl    " + tmp0 + ", %edx\n";
-//     assemblerText += "        movl    " + tmp1 + ", %eax\n";
-//     assemblerText += "        cmpl	%edx, %eax\n";
-//     assemblerText += "        setne	%al\n";
-//     assemblerText += "        movzbl	%al, %eax\n";
-//     return string("%eax");
-// }
-
-// antlrcpp::Any CodeGenVisitor::visitOp_sup(ifccParser::Op_supContext *context) override
-// {
-//     string tmp0 = (string)visit(context->expr(0));
-//     string tmp1 = (string)visit(context->expr(1));
-//     assemblerText += "        movl    " + tmp0 + ", %edx\n";
-//     assemblerText += "        movl    " + tmp1 + ", %eax\n";
-//     assemblerText += "        cmpl	%edx, %eax\n";
-//     assemblerText += "        setg	%al\n";
-//     assemblerText += "        movzbl	%al, %eax\n";
-//     return string("%eax");
-// }
-
-// antlrcpp::Any CodeGenVisitor::visitOp_inf(ifccParser::Op_infContext *context) override
-// {
-//     string tmp0 = (string)visit(context->expr(0));
-//     string tmp1 = (string)visit(context->expr(1));
-//     assemblerText += "        movl    " + tmp0 + ", %edx\n";
-//     assemblerText += "        movl    " + tmp1 + ", %eax\n";
-//     assemblerText += "        cmpl	%edx, %eax\n";
-//     assemblerText += "        setl	%al\n";
-//     assemblerText += "        movzbl	%al, %eax\n";
-//     return string("%eax");
-// }
-
-// antlrcpp::Any CodeGenVisitor::visitALPHANUMERIC(ifccParser::ALPHANUMERICContext *context)
-// {
-//     return string(to_string(offsets[context->ALPHANUMERIC()->getText()]) + "(%rbp)");
-// }
-
-// antlrcpp::Any CodeGenVisitor::visitOp_opposite(ifccParser::Op_oppositeContext *context) override
-// {
-//     string tmp0 = (string)visit(context->expr());
-//     assemblerText += "        movl    " + tmp0 + ", %eax\n";
-//     assemblerText += "        negl	%eax\n";
-//     return string("%eax");
-// }
-
-// antlrcpp::Any CodeGenVisitor::visitOp_not(ifccParser::Op_notContext *context) override
-// {
-//     string tmp0 = (string)visit(context->expr());
-//     assemblerText += "        cmpl	$0, " + tmp0 + "\n";
-//     assemblerText += "        sete	%al\n";
-//     assemblerText += "        movzbl	%al, %eax\n";
-//     return string("%eax");
-// }
+    // Result from function call is in %eax we move in a new temporary variable in a register
+	string place = allocateTmpVar(4,functionDatas[currentIndex],"%eax");
+    return place;
+}

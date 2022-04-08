@@ -31,6 +31,24 @@ antlrcpp::Any CodeGenVisitor::visitFunc(ifccParser::FuncContext *ctx){
 	cout<<"	# prologue\n"
 		"	pushq %rbp\n"
 		"	movq %rsp, %rbp\n\n";
+
+	// A function that's gonna be called with params (need to put the params/variables in registers)
+	if(funcName!="main" && ctx->ALPHANUMERIC().size()>1){
+		string registers_string[] = {"%edi","%esi","%edx","%ecx","%r8d","%r9d","r10d","r11d","r12d","r13d","r14d","r15d"};
+		vector<string> registers (registers_string, registers_string+(sizeof(registers_string)/sizeof(string)));
+		FunctionData * functionData = functionDatas[currentIndex];
+
+		// Get from registers and put the params into %rbp registers to become variables in the program function ( starting at -100(%rbp))
+		int currentOffset = -100;
+		for(int i=1; i<ctx->ALPHANUMERIC().size() && (i-1)<registers.size(); i++){
+			
+			string paramName = ctx->ALPHANUMERIC().at(i)->getText();
+			functionData->addToOffset(paramName,currentOffset);
+			string rightPos = string(to_string(currentOffset)+"(%rbp)");
+			cout<<" 	movl	"<<registers.at(i-1)<<", "<<rightPos<<"\n";
+			currentOffset-=4;
+		}
+	}
 	
 	for(auto & line : ctx->line()){
 		visit(line);
@@ -152,8 +170,11 @@ antlrcpp::Any CodeGenVisitor::visitAffectation_expr(ifccParser::Affectation_expr
 }
 
 antlrcpp::Any CodeGenVisitor::visitAffectation_function_call(ifccParser::Affectation_function_callContext *ctx){
-	  // TODO
-	  return 0;
+	visit(ctx->func_call());
+	string varName = ctx->ALPHANUMERIC()->getText();
+	unordered_map<string, int> offsets = functionDatas[currentIndex]->getOffsets();
+	cout<<"	movl	%eax, "<<offsets[varName]<<"(%rbp)\n";
+	return 0;
 }
 
 // Conditions
@@ -326,11 +347,22 @@ antlrcpp::Any CodeGenVisitor::visitReturn_expr(ifccParser::Return_exprContext *c
 // Functions
 
 antlrcpp::Any CodeGenVisitor::visitFunction_call(ifccParser::Function_callContext *ctx){
-    cout<<"\t call	"<<ctx->funcName->getText()<<"\n";
+
 	// Params of function
-	for(auto & param : ctx->primaryexpr()){
-		// cout<<param->getText()<<",";
+	int numberOfParams = ctx->func_param().size();
+	string registers_string[] = {"%edi","%esi","%edx","%ecx","%r8d","%r9d","r10d","r11d","r12d","r13d","r14d","r15d"};
+	vector<string> registers (registers_string, registers_string+(sizeof(registers_string)/sizeof(string)));
+	int numberOfRegisters = registers.size();
+
+	for(int i =0 ; i<numberOfParams && i<numberOfRegisters ; i++){
+		auto param = ctx->func_param().at(i);
+		string place = visit(param);
+		cout<<" 	movl	"<<place<<", "<<registers[i]<<"\n";
 	}
+
+	// Calling the function
+    cout<<"\t call	"<<ctx->funcName->getText()<<"\n";
+	
 	return 0;
 }
 
@@ -340,4 +372,22 @@ antlrcpp::Any CodeGenVisitor::visitDeclaration_function_call(ifccParser::Declara
 	unordered_map<string, int> offsets = functionDatas[currentIndex]->getOffsets();
 	cout<<"	movl	%eax, "<<offsets[varName]<<"(%rbp)\n";
 	return 0;
+}
+
+antlrcpp::Any CodeGenVisitor::visitF_int(ifccParser::F_intContext *ctx) {
+	int val = stoi(ctx->INT_CONST()->getText());
+    string place = string("$"+to_string(val));
+    return place;
+}
+
+antlrcpp::Any CodeGenVisitor::visitF_char(ifccParser::F_charContext *ctx) {
+	string temp = ctx->CHAR_CONST()->getText();
+	int val = (int)temp.at(1);
+	string place = string("$"+to_string(val));
+	return place;
+}
+
+antlrcpp::Any CodeGenVisitor::visitF_variable(ifccParser::F_variableContext *ctx) {
+	unordered_map<string, int> offsets = functionDatas[currentIndex]->getOffsets();
+    return string(to_string(offsets[ctx->ALPHANUMERIC()->getText()]) + "(%rbp)");
 }
