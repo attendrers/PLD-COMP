@@ -8,7 +8,11 @@ int main(){
             b = 2;
         }
     } else {
-        b = -a;
+        if (b == 2) {
+            a = 1;
+        } else {
+            b = -a;
+        }
     }
     return b;
 }
