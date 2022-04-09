@@ -40,6 +40,8 @@ antlrcpp::Any ReadVarsVisitor::visitProg(ifccParser::ProgContext *ctx){
 };
 
 antlrcpp::Any ReadVarsVisitor::visitFunc(ifccParser::FuncContext *ctx){
+    int numberOfParams = ctx->ALPHANUMERIC().size()-1;
+    functionDatas[currentIndex]->setNumberOfParams(numberOfParams);
 	for(auto & line : ctx->line()){
 		visit(line);
 	}
@@ -225,17 +227,13 @@ antlrcpp::Any ReadVarsVisitor::visitVariable(ifccParser::VariableContext *ctx){
     return 0;
 }
 
+antlrcpp::Any ReadVarsVisitor::visitFunction_call(ifccParser::Function_callContext *ctx){
+    int numberOfParams = ctx->func_param().size();
+    cout<<"###### "<<numberOfParams<<": "<<functionDatas[currentIndex]->getNumberOfParams();
+    if(numberOfParams!=functionDatas[currentIndex]->getNumberOfParams()){
+        throw out_of_range("Invalid number of params while calling function: "+ctx->funcName->getText());
+    }
+    return 0;
+}
 
-
-// unordered_map <string,int> ReadVarsVisitor::getOffsets(){
-//     return offsets;
-// };
-
-// int ReadVarsVisitor::getLastVarPosition(){
-//     return lastVarPosition;
-// }
-
-// unordered_map <string,int> ReadVarsVisitor::getTypes(){
-//     return types;
-// };
 

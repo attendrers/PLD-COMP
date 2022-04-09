@@ -9,15 +9,16 @@ using namespace std;
 // A class that regroups important data for each function
 class FunctionData
 {
-public:
+protected:
     unordered_map<string, int> offsets;
     unordered_map<string, int> types;
     vector<string> vars;
     int lastVarPosition;
+    int numberOfParams;
 
 public:
 
-    FunctionData() : lastVarPosition(0){};
+    FunctionData() : lastVarPosition(0),numberOfParams(0){};
 
     void addToOffset(string var, int offset){
         offsets[var]=offset;
@@ -43,6 +44,14 @@ public:
         return lastVarPosition;
     }
 
+    int getNumberOfParams(){
+        return numberOfParams;
+    }
+
+    void setNumberOfParams(int n){
+        numberOfParams=n;
+    }
+
     const unordered_map<string, int> & getTypes(){
         return types;
     };
@@ -50,4 +59,7 @@ public:
     const vector<string> & getVars(){
         return vars;
     };
+
+
+
 };

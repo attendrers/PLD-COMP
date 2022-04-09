@@ -54,6 +54,9 @@ public:
     
     virtual antlrcpp::Any visitVariable(ifccParser::VariableContext *ctx) override;
 
+    virtual antlrcpp::Any visitFunction_call(ifccParser::Function_callContext *ctx) override;
+
+    
     virtual antlrcpp::Any visitReturn_expr(ifccParser::Return_exprContext *ctx) override {
         return 0;
     }
